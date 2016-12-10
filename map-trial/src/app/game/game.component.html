@@ -1,0 +1,30 @@
+<header class="jumbotron">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-10">
+        <h1>{{ title }}</h1>
+      </div>
+      <div class="col-xs-2"></div>
+    </div>
+  </div>
+</header>
+
+<!-- this creates a google map on the page with the given lat/lng from -->
+<!-- the component as the initial center of the map: -->
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-8">
+      <sebm-google-map [latitude]="lat"
+                       [longitude]="lng"
+                       [streetViewControl]="false"
+                       [disableDoubleClickZoom]="true"
+                       (mapClick)="mapClick($event)">
+        <sebm-google-map-marker [latitude]="lat" [longitude]="lng"></sebm-google-map-marker>
+      </sebm-google-map>
+    </div>
+    <div class="col-xs-4">
+      <h1>Distance from {{ cityName }} is: {{ distance }} km</h1>
+    </div>
+  </div>
+</div>

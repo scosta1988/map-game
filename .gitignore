@@ -35,3 +35,9 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+#Ignore server db
+server/db
+
+#Hide email account data
+server/controller/secretData.js
