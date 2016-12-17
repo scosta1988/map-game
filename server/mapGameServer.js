@@ -95,68 +95,24 @@ server.post('/signup', function(req, res){
 server.post('/login', function(req, res){
     var body = req.body;
 
-    li.FindByEmail(body.email, function(success, docs){
-        if(success){
-            if(body.passHash == docs[0].passHash){
-                res.json({
-                    success: success,
-                    token: docs[0].token
-                });
-            }
-            else{
-                res.json({
-                    success: false,
-                    token: null
-                });
-            }
-        }
-        else{
-            res.json({
-                success: false,
-                token: null
-            });   
-        }
+    var email = body.email;
+    var passHash = body.passHash;
+
+    loginController.LogIn(email, passHash, function(message){
+        res.json({
+            success: message.success,
+            token: message.token
+        });
     });
 });
 
 server.get('/verifyAccount/:hash', function(req, res){
     var hash = req.params.hash;
 
-    var updatedElement = null;
-    li.FindAll(function(success, docs){
-        if(success){
-            docs.forEach(function(element, index, array){
-                if(Utils.StringToHexSha256(element._id) == hash)
-                {
-                    updatedElement = element;
-                }
-            });
-
-            if(updatedElement != null){
-                li.Update(updatedElement.email, updatedElement.passHash, updatedElement.token, true, function(success){
-                    if(success){
-                        res.json({
-                            success: true
-                        });
-                    }
-                    else{
-                        res.json({
-                            success: false
-                        });
-                    }
-                });
-            }
-            else{
-                res.json({
-                    success: false
-                });
-            }
-        }
-        else{
-            res.json({
-                success: false
-            });
-        }
+    loginController.Verify(hash, function(message){
+        res.json({
+            success: message.success 
+        });
     });
 });
 

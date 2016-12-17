@@ -41,3 +41,6 @@ server/db
 
 #Hide email account data
 server/controller/secretData.js
+
+#VSCode settings
+.vscode

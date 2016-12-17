@@ -1,6 +1,7 @@
 var LoginInformationDAO = require('../data/loginInformationDAO');
 var nodemailer = require('nodemailer');
 var SecretData = require('./secretData');
+var Utils = require('./utils');
 
 function LoginController() {
     var LoggedInArray = [];
@@ -15,9 +16,12 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
             });
         }
         else {
-            var token = "bla87y";
+            var date = new Date();
+            var blob = email + date.getMilliseconds().toString();
+            var shaHash = Utils.StringToHexSha256(blob);
+            var token = shaHash.slice(0, 9);
 
-            LoginInformationDAO.Create(email, passHash, token, function (success) {
+            LoginInformationDAO.Create(email, passHash, token, function (success, element) {
                 if (success) {
                     var mailTransporter = nodemailer.createTransport({
                         service: 'gmail',
@@ -27,12 +31,15 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
                         }
                     });
 
+                    var hash = Utils.StringToHexSha256(element._id);
+                    
                     var mailOptions = {
-                        from: '"Fred Foo 👥" <foobar@bar.com>', // sender address
-                        to: 'foobar@foo.com', // list of receivers
-                        subject: 'Map Game', // Subject line
-                        text: 'Map Game', // plaintext body
-                        html: '<b>Map Game! 🐴</b>' // html body
+                        from: '"Map Game Noreply" <noreply@mapgame.com>',
+                        to: email,
+                        subject: 'Map Game Verification',
+                        text: 'URL to verify account: http://localhost:4300/verifyAccount/' + hash,
+                        html: '<b>Map Game!</b><br>\n' +
+                              'Click <a href="http://localhost:4300/verifyAccount/' + hash + '">here</a> to verify your account'
                     };
 
                     mailTransporter.sendMail(mailOptions, function(error, info){
@@ -88,6 +95,50 @@ LoginController.prototype.LogIn = function (email, passHash, cb) {
                 success: false,
                 msg: "Could not find account",
                 token: ""
+            });
+        }
+    });
+}
+
+LoginController.prototype.Verify = function(hash, cb){
+    LoginInformationDAO.FindAll(function(success, docs){
+        if(success){
+            var updatedElement = null;
+
+            docs.forEach(function(element, index, array){
+                if(Utils.StringToHexSha256(element._id) == hash)
+                {
+                    updatedElement = element;
+                }
+            });
+
+            if(updatedElement != null){
+                li.Update(updatedElement.email, updatedElement.passHash, updatedElement.token, true, function(success){
+                    if(success){
+                        cb({
+                            success: true,
+                            msg: "OK"
+                        });
+                    }
+                    else{
+                        cb({
+                            success: false,
+                            msg: "Error updating account"
+                        });
+                    }
+                });
+            }
+            else{
+                cb({
+                    success: false,
+                    msg: "Could not find account"
+                });
+            }
+        }
+        else{
+            cb({
+                success: false,
+                msg: "Could not find account"
             });
         }
     });

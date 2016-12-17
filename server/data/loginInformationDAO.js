@@ -5,7 +5,7 @@ var LoginInformationDAO = {
     Create: function (email, passHash, token, cb) {
         mongo.connect(DataConstants.DB_URL, function (err, db) {
             if (err != null) {
-                cb(false);
+                cb(false, null);
             }
             else {
                 var toInsert = {
@@ -19,9 +19,9 @@ var LoginInformationDAO = {
                     .insertOne(toInsert, function (err, r) {
                         db.close();
                         if (err != null)
-                            cb(false)
+                            cb(false, null)
                         else
-                            cb(true);
+                            cb(true, r);
                     });
             }
 
