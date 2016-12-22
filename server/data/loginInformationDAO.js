@@ -21,7 +21,7 @@ var LoginInformationDAO = {
                         if (err != null)
                             cb(false, null)
                         else
-                            cb(true, r);
+                            cb(true, r.insertedId);
                     });
             }
 

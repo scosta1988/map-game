@@ -8,8 +8,9 @@ function LoginController() {
 }
 
 LoginController.prototype.SignUp = function (email, passHash, cb) {
-    LoginInformationDAO.FindByEmail(email, function (success, docs) {
+    LoginInformationDAO.FindByEmail(email, function (success, doc) {
         if (success) {
+            console.log("Signup: Account already exists");
             cb({
                 success: false,
                 msg: "Account already exists"
@@ -21,7 +22,7 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
             var shaHash = Utils.StringToHexSha256(blob);
             var token = shaHash.slice(0, 9);
 
-            LoginInformationDAO.Create(email, passHash, token, function (success, element) {
+            LoginInformationDAO.Create(email, passHash, token, function (success, insertedId) {
                 if (success) {
                     var mailTransporter = nodemailer.createTransport({
                         service: 'gmail',
@@ -31,7 +32,7 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
                         }
                     });
 
-                    var hash = Utils.StringToHexSha256(element._id);
+                    var hash = Utils.StringToHexSha256(insertedId + "");
                     
                     var mailOptions = {
                         from: '"Map Game Noreply" <noreply@mapgame.com>',
@@ -43,15 +44,18 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
                     };
 
                     mailTransporter.sendMail(mailOptions, function(error, info){
-                        console.log(info.response);
+                        if(info != null)
+                            console.log(info.response);
                     });
 
+                    console.log("Signup: OK");
                     cb({
                         success: true,
                         msg: "OK"
                     });
                 }
                 else {
+                    console.log("Signup: Could not add new account");
                     cb({
                         success: false,
                         msg: "Could not add new account"
@@ -67,6 +71,7 @@ LoginController.prototype.LogIn = function (email, passHash, cb) {
         if (success) {
             if (doc.passHash == passHash) {
                 if (doc.verified) {
+                    console.log("LogIn: OK");
                     cb({
                         success: true,
                         msg: "OK",
@@ -74,6 +79,7 @@ LoginController.prototype.LogIn = function (email, passHash, cb) {
                     });
                 }
                 else {
+                    console.log("LogIn: Account is not yet verified");
                     cb({
                         success: false,
                         msg: "Account is not yet verified",
@@ -82,6 +88,7 @@ LoginController.prototype.LogIn = function (email, passHash, cb) {
                 }
             }
             else {
+                console.log("LogIn: Could not find account");
                 cb({
                     success: false,
                     msg: "Could not find account",
@@ -91,6 +98,7 @@ LoginController.prototype.LogIn = function (email, passHash, cb) {
 
         }
         else {
+            console.log("LogIn: Could not find account");
             cb({
                 success: false,
                 msg: "Could not find account",
@@ -101,26 +109,29 @@ LoginController.prototype.LogIn = function (email, passHash, cb) {
 }
 
 LoginController.prototype.Verify = function(hash, cb){
+    console.log("hash: " + hash);
     LoginInformationDAO.FindAll(function(success, docs){
         if(success){
             var updatedElement = null;
 
             docs.forEach(function(element, index, array){
-                if(Utils.StringToHexSha256(element._id) == hash)
+                if(Utils.StringToHexSha256(element._id + "") == hash)
                 {
                     updatedElement = element;
                 }
             });
 
             if(updatedElement != null){
-                li.Update(updatedElement.email, updatedElement.passHash, updatedElement.token, true, function(success){
+                LoginInformationDAO.Update(updatedElement.email, updatedElement.passHash, updatedElement.token, true, function(success){
                     if(success){
+                        console.log("Verify: OK");
                         cb({
                             success: true,
                             msg: "OK"
                         });
                     }
                     else{
+                        console.log("Verify: Error updating account");
                         cb({
                             success: false,
                             msg: "Error updating account"
@@ -129,6 +140,7 @@ LoginController.prototype.Verify = function(hash, cb){
                 });
             }
             else{
+                console.log("Verify: Could not find account");
                 cb({
                     success: false,
                     msg: "Could not find account"
@@ -136,6 +148,7 @@ LoginController.prototype.Verify = function(hash, cb){
             }
         }
         else{
+            console.log("Verify: Could not find account");
             cb({
                 success: false,
                 msg: "Could not find account"
