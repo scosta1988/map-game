@@ -3,6 +3,9 @@ var nodemailer = require('nodemailer');
 var SecretData = require('./secretData');
 var Utils = require('./utils');
 
+var URLSchema = "http://";
+var URLServer = "localhost:4300/";
+
 function CreateToken(email){
     var date = new Date();
     var blob = email + date.getMilliseconds().toString();
@@ -73,9 +76,9 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
                         from: '"Map Game Noreply" <noreply@mapgame.com>',
                         to: email,
                         subject: 'Map Game Verification',
-                        text: 'URL to verify account: http://localhost:4300/verifyAccount/' + hash,
+                        text: 'URL to verify account: ' + URLSchema + URLServer + 'verifyAccount/' + hash,
                         html: '<b>Map Game!</b><br>\n' +
-                              'Click <a href="http://localhost:4300/verifyAccount/' + hash + '">here</a> to verify your account'
+                              'Click <a href="' + URLSchema + URLServer + 'verifyAccount/' + hash + '">here</a> to verify your account'
                     };
 
                     mailTransporter.sendMail(mailOptions, function(error, info){
