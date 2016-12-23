@@ -3,6 +3,46 @@ var nodemailer = require('nodemailer');
 var SecretData = require('./secretData');
 var Utils = require('./utils');
 
+function CreateToken(email){
+    var date = new Date();
+    var blob = email + date.getMilliseconds().toString();
+    var shaHash = Utils.StringToHexSha256(blob);
+    return shaHash.slice(0, 9);
+}
+
+function UpdateLastAccessByEmail(email, cb){
+    LoginInformationDAO.FindByEmail(email, function(success, doc){
+        if(success){
+            var lastAccess = Math.floor(Date.now() / 1000);
+            LoginInformationDAO.Update(document.email,
+                                       document.passHash,
+                                       document.token,
+                                       document.verified,
+                                       lastAccess,
+                                       function(success){
+                                           cb(success);
+                                       });
+        }
+        else{
+            console.log("UpdateLastAccessByEmail: Account not found");
+            cb(false);
+        }
+    });
+}
+
+function UpdateLastAccess(document, cb){
+    var lastAccess = Math.floor(Date.now() / 1000);
+
+    LoginInformationDAO.Update(document.email,
+                               document.passHash,
+                               document.token,
+                               document.verified,
+                               lastAccess,
+                               function(success){
+                                   cb(success);
+                               });
+}
+
 function LoginController() {
     var LoggedInArray = [];
 }
@@ -17,12 +57,7 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
             });
         }
         else {
-            var date = new Date();
-            var blob = email + date.getMilliseconds().toString();
-            var shaHash = Utils.StringToHexSha256(blob);
-            var token = shaHash.slice(0, 9);
-
-            LoginInformationDAO.Create(email, passHash, token, function (success, insertedId) {
+            LoginInformationDAO.Create(email, passHash, function (success, insertedId) {
                 if (success) {
                     var mailTransporter = nodemailer.createTransport({
                         service: 'gmail',
@@ -66,17 +101,44 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
     });
 }
 
-LoginController.prototype.LogIn = function (email, passHash, cb) {
+LoginController.prototype.LogIn = function (email, passHash, tokenTimeout, cb) {
     LoginInformationDAO.FindByEmail(email, function (success, doc) {
         if (success) {
             if (doc.passHash == passHash) {
                 if (doc.verified) {
-                    console.log("LogIn: OK");
-                    cb({
-                        success: true,
-                        msg: "OK",
-                        token: doc.token
-                    });
+                    var now = Date.now();
+                    if(doc.lastAccess + tokenTimeout < now){
+                        console.log("LogIn: Token Expired");
+
+                        var token = CreateToken(doc.email);
+                        doc.token = token;
+                        UpdateLastAccess(doc, function(success){
+                            if(success){
+                                console.log("LogIn: OK");
+                                cb({
+                                    success: true,
+                                    msg: "OK",
+                                    token: doc.token
+                                });
+                            }
+                            else{
+                                console.log("LogIn: Error when updating last access");
+                                cb({
+                                    success: false,
+                                    msg: "Error when updating last access",
+                                    token: ""
+                                });
+                            }
+                        });
+                    }
+                    else{
+                        console.log("LogIn: OK");
+                        cb({
+                            success: true,
+                            msg: "OK",
+                            token: doc.token
+                        });
+                    }
                 }
                 else {
                     console.log("LogIn: Account is not yet verified");

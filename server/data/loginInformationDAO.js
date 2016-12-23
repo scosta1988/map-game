@@ -2,7 +2,7 @@ var mongo = require('mongodb').MongoClient;
 var DataConstants = require('./dataConstants');
 
 var LoginInformationDAO = {
-    Create: function (email, passHash, token, cb) {
+    Create: function (email, passHash, cb) {
         mongo.connect(DataConstants.DB_URL, function (err, db) {
             if (err != null) {
                 cb(false, null);
@@ -11,7 +11,8 @@ var LoginInformationDAO = {
                 var toInsert = {
                     email: email,
                     passHash: passHash,
-                    token: token,
+                    token: "",
+                    lastAccess: 0,
                     verified: false
                 }
 
@@ -28,7 +29,7 @@ var LoginInformationDAO = {
         });
     },
 
-    Update: function (email, passHash, token, verified, cb) {
+    Update: function (email, passHash, token, verified, lastAccess, cb) {
         mongo.connect(DataConstants.DB_URL, function (err, db) {
             if (err != null) {
                 cb(false);
@@ -38,6 +39,7 @@ var LoginInformationDAO = {
                     email: email,
                     passHash: passHash,
                     token: token,
+                    lastAccess: lastAccess,
                     verified: verified
                 }
 
