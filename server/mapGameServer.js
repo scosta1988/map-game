@@ -15,6 +15,8 @@ server.use(function(req, res, next) {
   next();
 });
 
+var tokenTimeout = 10 * 60; //10 minutes
+
 function calculateDistance(lat1, lng1, lat2, lng2) {
     var earthRadius = 6371000;
 
@@ -98,7 +100,7 @@ server.post('/login', function(req, res){
     var email = body.email;
     var passHash = body.passHash;
 
-    loginController.LogIn(email, passHash, function(message){
+    loginController.LogIn(email, passHash, tokenTimeout, function(message){
         res.json({
             success: message.success,
             token: message.token

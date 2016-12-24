@@ -13,6 +13,7 @@ var LoginInformationDAO = {
                     passHash: passHash,
                     token: "",
                     lastAccess: 0,
+                    createdDate: 0,
                     verified: false
                 }
 
@@ -29,7 +30,7 @@ var LoginInformationDAO = {
         });
     },
 
-    Update: function (email, passHash, token, verified, lastAccess, cb) {
+    Update: function (email, passHash, token, verified, lastAccess, createdDate, cb) {
         mongo.connect(DataConstants.DB_URL, function (err, db) {
             if (err != null) {
                 cb(false);
@@ -40,6 +41,7 @@ var LoginInformationDAO = {
                     passHash: passHash,
                     token: token,
                     lastAccess: lastAccess,
+                    createdDate: createdDate,
                     verified: verified
                 }
 

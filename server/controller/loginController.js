@@ -13,15 +13,15 @@ function CreateToken(email){
     return shaHash.slice(0, 9);
 }
 
-function UpdateLastAccessByEmail(email, cb){
+function UpdateLastAccessByEmail(email, lastAccess, cb){
     LoginInformationDAO.FindByEmail(email, function(success, doc){
         if(success){
-            var lastAccess = Math.floor(Date.now() / 1000);
             LoginInformationDAO.Update(document.email,
                                        document.passHash,
                                        document.token,
                                        document.verified,
                                        lastAccess,
+                                       document.createdDate,
                                        function(success){
                                            cb(success);
                                        });
@@ -41,13 +41,27 @@ function UpdateLastAccess(document, cb){
                                document.token,
                                document.verified,
                                lastAccess,
+                               document.createdDate,
+                               function(success){
+                                   cb(success);
+                               });
+}
+
+function UpdateNewTokenDates(document, cb){
+    var now = Math.floor(Date.now() / 1000);
+
+    LoginInformationDAO.Update(document.email,
+                               document.passHash,
+                               document.token,
+                               document.verified,
+                               now,
+                               now,
                                function(success){
                                    cb(success);
                                });
 }
 
 function LoginController() {
-    var LoggedInArray = [];
 }
 
 LoginController.prototype.SignUp = function (email, passHash, cb) {
@@ -109,39 +123,26 @@ LoginController.prototype.LogIn = function (email, passHash, tokenTimeout, cb) {
         if (success) {
             if (doc.passHash == passHash) {
                 if (doc.verified) {
-                    var now = Date.now();
-                    if(doc.lastAccess + tokenTimeout < now){
-                        console.log("LogIn: Token Expired");
-
-                        var token = CreateToken(doc.email);
-                        doc.token = token;
-                        UpdateLastAccess(doc, function(success){
-                            if(success){
-                                console.log("LogIn: OK");
-                                cb({
-                                    success: true,
-                                    msg: "OK",
-                                    token: doc.token
-                                });
-                            }
-                            else{
-                                console.log("LogIn: Error when updating last access");
-                                cb({
-                                    success: false,
-                                    msg: "Error when updating last access",
-                                    token: ""
-                                });
-                            }
-                        });
-                    }
-                    else{
-                        console.log("LogIn: OK");
-                        cb({
-                            success: true,
-                            msg: "OK",
-                            token: doc.token
-                        });
-                    }
+                    var token = CreateToken(doc.email);
+                    doc.token = token;
+                    UpdateNewTokenDates(doc, function(success){
+                        if(success){
+                            console.log("LogIn: OK");
+                            cb({
+                                success: true,
+                                msg: "OK",
+                                token: doc.token
+                            });
+                        }
+                        else{
+                            console.log("LogIn: Error when updating token dates");
+                            cb({
+                                success: false,
+                                msg: "Error when updating token dates",
+                                token: ""
+                            });
+                        }
+                    });
                 }
                 else {
                     console.log("LogIn: Account is not yet verified");
@@ -174,7 +175,7 @@ LoginController.prototype.LogIn = function (email, passHash, tokenTimeout, cb) {
 }
 
 LoginController.prototype.Verify = function(hash, cb){
-    console.log("hash: " + hash);
+    console.log("Verify: Hash: " + hash);
     LoginInformationDAO.FindAll(function(success, docs){
         if(success){
             var updatedElement = null;
@@ -187,22 +188,28 @@ LoginController.prototype.Verify = function(hash, cb){
             });
 
             if(updatedElement != null){
-                LoginInformationDAO.Update(updatedElement.email, updatedElement.passHash, updatedElement.token, true, function(success){
-                    if(success){
-                        console.log("Verify: OK");
-                        cb({
-                            success: true,
-                            msg: "OK"
-                        });
-                    }
-                    else{
-                        console.log("Verify: Error updating account");
-                        cb({
-                            success: false,
-                            msg: "Error updating account"
-                        });
-                    }
-                });
+                LoginInformationDAO.Update(updatedElement.email,
+                                           updatedElement.passHash,
+                                           updatedElement.token,
+                                           true,
+                                           0,
+                                           0,
+                                           function(success){
+                                                if(success){
+                                                    console.log("Verify: OK");
+                                                    cb({
+                                                        success: true,
+                                                        msg: "OK"
+                                                    });
+                                                }
+                                                else{
+                                                    console.log("Verify: Error updating account");
+                                                    cb({
+                                                        success: false,
+                                                        msg: "Error updating account"
+                                                    });
+                                                }
+                                            });
             }
             else{
                 console.log("Verify: Could not find account");
@@ -219,6 +226,45 @@ LoginController.prototype.Verify = function(hash, cb){
                 msg: "Could not find account"
             });
         }
+    });
+}
+
+LoginController.prototype.FetchByToken = function(token, cb){
+    LoginInformationDAO.FindByToken(token, function(success, doc){
+        if(success){
+            console.log("FetchByToken: OK");
+            cb(true, doc);
+        }
+        else{
+            console.log("FetchByToken: Error finding account");
+            cb(false, null);
+        }
+    });
+}
+
+LoginController.prototype.LogOut = function(token, cb){
+    LoginInformationDAO.FindByToken(token, function(success, doc){
+        if(success){
+            LoginInformationDAO.Update(doc.email,
+                                       doc.passHash,
+                                       doc.token,
+                                       doc.verified,
+                                       0,
+                                       0,
+                                       function(success){
+                                           cb(success);
+                                       });
+        }
+        else{
+            console.log("Logout: Error finding account");
+            cb(false, null);
+        }
+    });
+}
+
+LoginController.prototype.UpdateLastAccess = function(email, lasAccess, cb){
+    UpdateLastAccessByEmail(email, lasAccess, function(success){
+        cb(success); 
     });
 }
 
