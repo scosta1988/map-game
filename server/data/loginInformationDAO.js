@@ -49,7 +49,7 @@ var LoginInformationDAO = {
                     .updateOne({ email: email }, { $set: toUpdate }, function (err, r) {
                         db.close();
                         if (err != null)
-                            cb(false)
+                            cb(false);
                         else
                             cb(true);
                     });

@@ -118,7 +118,7 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
     });
 }
 
-LoginController.prototype.LogIn = function (email, passHash, tokenTimeout, cb) {
+LoginController.prototype.Login = function (email, passHash, cb) {
     LoginInformationDAO.FindByEmail(email, function (success, doc) {
         if (success) {
             if (doc.passHash == passHash) {
