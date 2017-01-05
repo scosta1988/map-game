@@ -131,13 +131,58 @@ var AccountDAO = {
         });
     },
     FindByEmail: function(email, cb){
-
+        mongo.connect(DataConstants.DB_URL, function(err, db){
+            if(err != null){
+                cb(false, null);
+            }
+            else{
+                db.collection(DataConstants.ACCOUNT)
+                    .find({email: email}).limit(1).next(function(err, doc){
+                        if(err != null){
+                            cb(false, null);
+                        }
+                        else{
+                            cb(true, doc);
+                        }
+                    });
+            }
+        });
     },
     FindByToken: function(token, cb){
-
+        mongo.connect(DataConstants.DB_URL, function(err, db){
+            if(err != null){
+                cb(false, null);
+            }
+            else{
+                db.collection(DataConstants.ACCOUNT)
+                    .find({token: token}).limit(1).next(function(err, doc){
+                        if(err != null){
+                            cb(false, null);
+                        }
+                        else{
+                            cb(true, doc);
+                        }
+                    });
+            }
+        });
     },
     FindByUserId: function(userId, cb){
-        
+        mongo.connect(DataConstants.DB_URL, function(err, db){
+            if(err != null){
+                cb(false, null);
+            }
+            else{
+                db.collection(DataConstants.ACCOUNT)
+                    .find({userId: userId}).limit(1).next(function(err, doc){
+                        if(err != null){
+                            cb(false, null);
+                        }
+                        else{
+                            cb(true, doc);
+                        }
+                    });
+            }
+        });
     },
 };
 
