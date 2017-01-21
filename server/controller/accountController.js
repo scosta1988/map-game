@@ -8,6 +8,7 @@ function AccountController(){
     var LoggedInArray = [];
     var loginController = new LoginController();
 
+    var LoggedInArrayMgmtInterval = setInterval(this.CleanLoggedInArray, 5000);
 }
 
 function IsTokenValid(createdDate, lastAccess){
@@ -103,6 +104,29 @@ AccountController.prototype.Verify = function(email, hash, cb){
     });
 }
 
-AccountController.prototype.UpdateUserInfo = function(){}
+AccountController.prototype.UpdateUserInfo = function(email, name, picture, achievements, history, friends, cb){
+    AccountDAO.FindByEmail(email, function(success, document){
+        if(!success){
+            cb(false);
+        }
+        else{
+            AccountDAO.Update(email, name, document.token, document.userId, picture, achievements, history, friends, function(success){
+                cb(success);
+            });
+        }
+    });
+}
 
-AccountController.prototype.CleanLoggedInArray() = function(){}
+AccountController.prototype.CleanLoggedInArray = function(){
+    var now = Math.floor(Date.now() / 1000);
+
+    var i = 0;
+    while(i < this.LoggedInArray.length){
+        if(this.LoggedInArray[i].lastAccess + 600 < now){ //more than 10 minutes have passed
+            this.LoggedInArray.splice(i, 1);
+        }
+        else{
+            i++;
+        }
+    }
+}

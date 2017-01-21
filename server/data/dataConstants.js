@@ -3,7 +3,9 @@ var DataConstants = {
 
     Collections: {
         LOGIN_INFORMATION: 'LoginInformation',
-        ACCOUNT: 'Account'
+        ACCOUNT: 'Account',
+        CHALLENGE: 'Challenge',
+        CITY: 'City'
     }
 };
 
