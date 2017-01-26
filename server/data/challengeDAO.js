@@ -2,7 +2,7 @@ var mongo = require('mongodb').MongoClient;
 var DataConstants = require('./dataConstants');
 
 var ChallengeDAO = {
-    Create: function(name, listOfCities, description){
+    Create: function(name, listOfCities, description, picturesUrls, ranks, grades, timeout, cooldown, mapCentering, cb){
         mongo.connect(DataConstants.DB_URL, function(err, db){
             if(err != null){
                 cb(false, null);
@@ -11,7 +11,13 @@ var ChallengeDAO = {
                 var toCreate = {
                     name: name,
                     listOfCities: listOfCities,
-                    description: description
+                    description: description,
+                    picturesUrls: picturesUrls,
+                    ranks: ranks,
+                    grades: grades,
+                    timeout: timeout,
+                    cooldown: cooldown,
+                    mapCentering: mapCentering
                 }
 
                 db.collection(DataConstants.Collections.CHALLENGE)
@@ -48,7 +54,7 @@ var ChallengeDAO = {
             }
         });
     },
-    Update: function(id, name, listOfCities, description, cb){
+    Update: function(id, name, listOfCities, description, picturesUrls, ranks, grades, timeout, cooldown, mapCentering, cb){
         mongo.connect(DataConstants.DB_URL, function(err, db){
             if(err != null){
                 cb(false);
@@ -57,7 +63,13 @@ var ChallengeDAO = {
                 var toUpdate = {
                     name: name,
                     listOfCities: listOfCities,
-                    description: description
+                    description: description,
+                    picturesUrls: picturesUrls,
+                    ranks: ranks,
+                    grades: grades,
+                    timeout: timeout,
+                    cooldown: cooldown,
+                    mapCentering: mapCentering
                 }
 
                 db.collection(DataConstants.Collections.CHALLENGE)
@@ -103,6 +115,28 @@ var ChallengeDAO = {
                         }
                         else{
                             cb(true, doc);
+                        }
+                    });
+            }
+        });
+    },
+    UpdateRanks: function(id, ranks, cb){
+        mongo.connect(DataConstants.DB_URL, function(err, db){
+            if(err != null){
+                cb(false);
+            }
+            else{
+                var toUpdate = {
+                    ranks: ranks
+                }
+
+                db.collection(DataConstants.Collections.CHALLENGE)
+                    .updateOne({_id: id}, {$set: toUpdate}, function(err, r){
+                        if(err != null){
+                            cb(false);
+                        }
+                        else{
+                            cb(true);
                         }
                     });
             }

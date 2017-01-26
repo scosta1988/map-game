@@ -153,7 +153,7 @@ function GetFinalScore(userId, cb){
 
 function GetChallengeByUserId(userId){
     var challenge = challengeArray.filter(function(value, index, array){
-        if(value.userId == userId){
+        if(value.GetUserId() == userId){
             return true;
         }
         else{
@@ -203,24 +203,45 @@ function toRadians(angle) {
 
 //Class
 function ChallengeController(userId, challengeModel){
-    var model = challengeModel;
     var userId = userId;
+    var listOfCities = challengeModel.listOfCities;
     var currentCity = challengeModel.listOfCities[0];
-    var currentTimeout = 0;
+    var progress = 0;
+    var timeout = challengeModel.timeout;
+    var cooldown = challengeModel.cooldown;
+
+    var currentTimeout = challengeModel.timeout;
     var score = {
         overallScore: 0,
         individualScore: []
     }
+
     var challengeEnded = false;
 
     var challengeSyncInterval = setInterval(function(){
-        
+        currentTimeout--;
+        if(currentTimeout == 0){
+            if(currentCity == null){
+                currentCity = listOfCities[progress];
+                currentTimeout = timeout;
+            }
+            else{
+                progress++;
+                if(progress < listOfCities.length){
+                    currentCity = null;
+                    currentTimeout = cooldown;
+                }
+                else{
+                    EndChallenge();
+                }
+            }
+        }
     }, 1000);
 
     challengeArray.push(this);
 
     function EndChallenge(){
-        this.challengeEnded = true;
+        challengeEnded = true;
     }
 }
 
@@ -243,6 +264,15 @@ ChallengeController.prototype.CityGuess = function(lat, lng){
 
         this.score.overallScore += points;
         this.score.individualScore.push(points);
+
+        this.progress++;
+        if(this.progress < this.listOfCities.length){
+            this.currentCity = null;
+            this.currentTimeout = this.cooldown;
+        }
+        else{
+            this.EndChallenge();
+        }
 
         return({
             ErrCode: ErrorCodes.OK,
@@ -331,6 +361,10 @@ ChallengeController.prototype.GetFinalScore = function(cb){
             Ranks: 0
         })
     }
+}
+
+ChallengeController.prototype.GetUserId = function(){
+    return this.userId;
 }
 
 module.exports.ChallengeInfo = ChallengeInfo;
