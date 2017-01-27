@@ -199,14 +199,16 @@ LoginController.prototype.Verify = function(hash, cb){
                                                     console.log("Verify: OK");
                                                     cb({
                                                         success: true,
-                                                        msg: "OK"
+                                                        msg: "OK",
+                                                        loginInformation: updatedElement
                                                     });
                                                 }
                                                 else{
                                                     console.log("Verify: Error updating account");
                                                     cb({
                                                         success: false,
-                                                        msg: "Error updating account"
+                                                        msg: "Error updating account",
+                                                        loginInformation: null
                                                     });
                                                 }
                                             });
@@ -215,7 +217,8 @@ LoginController.prototype.Verify = function(hash, cb){
                 console.log("Verify: Could not find account");
                 cb({
                     success: false,
-                    msg: "Could not find account"
+                    msg: "Could not find account",
+                    loginInformation: null
                 });
             }
         }
@@ -223,7 +226,8 @@ LoginController.prototype.Verify = function(hash, cb){
             console.log("Verify: Could not find account");
             cb({
                 success: false,
-                msg: "Could not find account"
+                msg: "Could not find account",
+                loginInformation: null
             });
         }
     });

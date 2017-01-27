@@ -100,7 +100,16 @@ AccountController.prototype.SignUp = function(email, passHash, cb){
 AccountController.prototype.Verify = function(hash, cb){
     this.loginController.Verify(hash, function(message){
         if(message.success){
-            AccountDAO.Create()
+            var loginInformation = message.loginInformation;
+            AccountDAO.Create(loginController.email, loginController.name, loginController.token,
+                              loginController.userId, function(success, insertedId){
+                                  if(success){
+                                      cb(true);
+                                  }
+                                  else{
+                                      cb(false);
+                                  }
+            });
         }
         else{
             cb(false);

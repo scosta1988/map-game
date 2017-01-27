@@ -154,8 +154,10 @@ server.post('/logout', function(req, res){
 server.get('/verifyAccount/:hash', function(req, res){
     var hash = req.params.hash;
 
-    accountController.Verify(hash, function(){
-        
+    accountController.Verify(hash, function(success){
+        res.json({
+            success: success
+        })
     });
 });
 
