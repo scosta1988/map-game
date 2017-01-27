@@ -203,22 +203,22 @@ function toRadians(angle) {
 
 //Class
 function ChallengeController(userId, challengeModel){
-    var userId = userId;
-    var listOfCities = challengeModel.listOfCities;
-    var currentCity = challengeModel.listOfCities[0];
-    var progress = 0;
-    var timeout = challengeModel.timeout;
-    var cooldown = challengeModel.cooldown;
+    this.userId = userId;
+    this.listOfCities = challengeModel.listOfCities;
+    this.currentCity = challengeModel.listOfCities[0];
+    this.progress = 0;
+    this.timeout = challengeModel.timeout;
+    this.cooldown = challengeModel.cooldown;
 
-    var currentTimeout = challengeModel.timeout;
-    var score = {
+    this.currentTimeout = challengeModel.timeout;
+    this.score = {
         overallScore: 0,
         individualScore: []
     }
 
-    var challengeEnded = false;
+    this.challengeEnded = false;
 
-    var challengeSyncInterval = setInterval(function(){
+    this.challengeSyncInterval = setInterval(function(){
         currentTimeout--;
         if(currentTimeout == 0){
             if(currentCity == null){
@@ -236,7 +236,7 @@ function ChallengeController(userId, challengeModel){
                 }
             }
         }
-    }, 1000);
+    }.bind(this), 1000);
 
     challengeArray.push(this);
 

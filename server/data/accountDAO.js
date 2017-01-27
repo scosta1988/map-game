@@ -42,7 +42,7 @@ var AccountDAO = {
                     email: email
                 }
 
-                db.collection(DataConstants.ACCOUNT)
+                db.collection(DataConstants.Collections.ACCOUNT)
                     .deleteOne(toRemove, function(err, r){
                         db.close();
                         if(err != null){
@@ -65,7 +65,7 @@ var AccountDAO = {
                     token: token
                 }
 
-                db.collection(DataConstants.ACCOUNT)
+                db.collection(DataConstants.Collections.ACCOUNT)
                     .deleteOne(toRemove, function(err, r){
                         db.close();
                         if(err != null){
@@ -88,7 +88,7 @@ var AccountDAO = {
                     userId: userId
                 }
 
-                db.collection(DataConstants.ACCOUNT)
+                db.collection(DataConstants.Collections.ACCOUNT)
                     .deleteOne(toRemove, function(err, r){
                         db.close();
                         if(err != null){
@@ -118,7 +118,7 @@ var AccountDAO = {
                     friends: friends
                 };
 
-                db.collection(DataConstants.ACCOUNT)
+                db.collection(DataConstants.Collections.ACCOUNT)
                     .updateOne({email: email}, {$set: toUpdate}, function(err, r){
                         if(err != null){
                             cb(false);
@@ -136,7 +136,7 @@ var AccountDAO = {
                 cb(false, null);
             }
             else{
-                db.collection(DataConstants.ACCOUNT)
+                db.collection(DataConstants.Collections.ACCOUNT)
                     .find({email: email}).limit(1).next(function(err, doc){
                         if(err != null){
                             cb(false, null);
@@ -154,7 +154,7 @@ var AccountDAO = {
                 cb(false, null);
             }
             else{
-                db.collection(DataConstants.ACCOUNT)
+                db.collection(DataConstants.Collections.ACCOUNT)
                     .find({token: token}).limit(1).next(function(err, doc){
                         if(err != null){
                             cb(false, null);
@@ -172,7 +172,7 @@ var AccountDAO = {
                 cb(false, null);
             }
             else{
-                db.collection(DataConstants.ACCOUNT)
+                db.collection(DataConstants.Collections.ACCOUNT)
                     .find({userId: userId}).limit(1).next(function(err, doc){
                         if(err != null){
                             cb(false, null);

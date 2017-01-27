@@ -5,10 +5,10 @@ var createdTokenTimeout = 3600 * 24 * 30 * 6; //6 months
 var lastAccessTokenTimeout = 3600 * 24 * 30; //1 month
 
 function AccountController(){
-    var LoggedInArray = [];
-    var loginController = new LoginController();
+    this.LoggedInArray = [];
+    this.loginController = new LoginController();
 
-    var LoggedInArrayMgmtInterval = setInterval(this.CleanLoggedInArray, 5000);
+    this.LoggedInArrayMgmtInterval = setInterval(this.CleanLoggedInArray.bind(this), 5000);
 }
 
 function IsTokenValid(createdDate, lastAccess){
@@ -54,7 +54,8 @@ AccountController.prototype.FetchAccount = function(token, cb){
 }
 
 AccountController.prototype.Login = function(email, passHash, cb){
-    this.loginController.LogIn(email, passHash, function(message){
+    var LoggedInArray = this.LoggedInArray;
+    this.loginController.Login(email, passHash, function(message){
         if(!message.success){
             console.log("Error with login");
             cb(false, null);
@@ -66,7 +67,7 @@ AccountController.prototype.Login = function(email, passHash, cb){
                     cb(false, null);
                 }
                 else{
-                    this.LoggedInArray.push(doc);
+                    LoggedInArray.push(doc);
                     cb(true, doc);
                 }
             });
@@ -143,3 +144,5 @@ AccountController.prototype.CleanLoggedInArray = function(){
         }
     }
 }
+
+module.exports = AccountController;
