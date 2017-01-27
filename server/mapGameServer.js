@@ -114,6 +114,9 @@ server.post('/signup', function(req, res){
     var email = body.email;
     var passHash = body.passHash;
 
+    console.log(req);
+    console.log(body);
+
     accountController.SignUp(email, passHash, function(message){
         res.json(message);
     });

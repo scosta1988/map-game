@@ -20,6 +20,7 @@ function IsTokenValid(createdDate, lastAccess){
 }
 
 AccountController.prototype.FetchAccount = function(token, cb){
+    var LoggedInArray = this.LoggedInArray;
     var account = this.LoggedInArray.find(function(element){
         return element.token == token;
     });
@@ -37,7 +38,7 @@ AccountController.prototype.FetchAccount = function(token, cb){
                             cb(false, null);
                         }
                         else{
-                            this.LoggedInArray.push(doc);
+                            LoggedInArray.push(doc);
                             cb(true, doc);
                         }
                     });
@@ -61,14 +62,22 @@ AccountController.prototype.Login = function(email, passHash, cb){
             cb(false, null);
         }
         else{
-            AccountDAO.FindByToken(message.token, function(success, doc){
+            AccountDAO.FindByEmail(email, function(success, doc){
                 if(!success){
                     console.log("Error retrieving user information");
                     cb(false, null);
                 }
                 else{
-                    LoggedInArray.push(doc);
-                    cb(true, doc);
+                    doc.token = message.token;
+                    AccountDAO.UpdateToken(email, doc.token, function(success){
+                        if(!success){
+                            cb(false, null);
+                        }
+                        else{
+                            LoggedInArray.push(doc);
+                            cb(true, doc);
+                        }
+                    });
                 }
             });
         }
@@ -102,8 +111,8 @@ AccountController.prototype.Verify = function(hash, cb){
     this.loginController.Verify(hash, function(message){
         if(message.success){
             var loginInformation = message.loginInformation;
-            AccountDAO.Create(loginController.email, loginController.name, loginController.token,
-                              loginController.userId, function(success, insertedId){
+            AccountDAO.Create(loginInformation.email, loginInformation.name, loginInformation.token,
+                              loginInformation.email, function(success, insertedId){
                                   if(success){
                                       cb(true);
                                   }

@@ -130,6 +130,28 @@ var AccountDAO = {
             }
         });
     },
+    UpdateToken: function(email, token, cb){
+        mongo.connect(DataConstants.DB_URL, function(err, db){
+            if(err != null){
+                cb(false);
+            }
+            else{
+                var toUpdate = {
+                    token: token
+                };
+
+                db.collection(DataConstants.Collections.ACCOUNT)
+                    .updateOne({email: email}, {$set: toUpdate}, function(err, r){
+                        if(err != null){
+                            cb(false);
+                        }
+                        else{
+                            cb(true);
+                        }
+                    });
+            }
+        });
+    },
     FindByEmail: function(email, cb){
         mongo.connect(DataConstants.DB_URL, function(err, db){
             if(err != null){

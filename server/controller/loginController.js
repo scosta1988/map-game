@@ -98,6 +98,8 @@ LoginController.prototype.SignUp = function (email, passHash, cb) {
                     mailTransporter.sendMail(mailOptions, function(error, info){
                         if(info != null)
                             console.log(info.response);
+                        else
+                            console.log(error);
                     });
 
                     console.log("Signup: OK");
@@ -125,6 +127,9 @@ LoginController.prototype.Login = function (email, passHash, cb) {
                 if (doc.verified) {
                     var token = CreateToken(doc.email);
                     doc.token = token;
+                    
+                    console.log("Generated Token:" + token);
+
                     UpdateNewTokenDates(doc, function(success){
                         if(success){
                             console.log("LogIn: OK");
