@@ -1,5 +1,6 @@
 var mongo = require('mongodb').MongoClient;
 var DataConstants = require('./dataConstants');
+var CityDAO = require('./cityDAO');
 
 var ChallengeDAO = {
     Create: function(name, listOfCities, description, picturesUrls, ranks, grades, timeout, cooldown, mapCentering, cb){
@@ -96,6 +97,16 @@ var ChallengeDAO = {
                             cb(false, null);
                         }
                         else{
+                            var cityList = [];
+                            doc.listOfCities.forEach(function(element) {
+                                CityDAO.FindByName(element, function(success, city){
+                                    if(success){
+                                        cityList.push(city);
+                                    }
+                                });
+                            }, this);
+
+                            doc.listOfCities = cityList;
                             cb(true, doc);
                         }
                     });
@@ -114,6 +125,16 @@ var ChallengeDAO = {
                             cb(false, null);
                         }
                         else{
+                            var cityList = [];
+                            doc.listOfCities.forEach(function(element) {
+                                CityDAO.FindByName(element, function(success, city){
+                                    if(success){
+                                        cityList.push(city);
+                                    }
+                                });
+                            }, this);
+
+                            doc.listOfCities = cityList;
                             cb(true, doc);
                         }
                     });

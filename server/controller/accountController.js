@@ -83,6 +83,10 @@ AccountController.prototype.LogOut = function(token, cb){
             if(idx != -1){
                 this.LoggedInArray.splice(idx, 1);
             }
+            cb(true);
+        }
+        else{
+            cb(false);
         }
     });
 }
@@ -93,7 +97,7 @@ AccountController.prototype.SignUp = function(email, passHash, cb){
     });
 }
 
-AccountController.prototype.Verify = function(email, hash, cb){
+AccountController.prototype.Verify = function(hash, cb){
     this.loginController.Verify(hash, function(message){
         if(message.success){
             AccountDAO.Create()

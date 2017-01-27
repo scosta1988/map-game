@@ -1,11 +1,9 @@
 var express = require('express');
-var ChallengeData = require('./challengeData');
 var bodyParser = require('body-parser');
 var fs = require('fs');
-var loginControllerFactory = require('./controller/loginController');
-var loginController = new loginControllerFactory();
-var SHA256 = require('crypto-js/sha256');
-var Utils = require('./controller/utils');
+var AccountController = require('./controller/accountController');
+var accountController = new AccountController();
+var ChallengeController = require('./controller/challengeController');
 
 var server = express();
 server.use(bodyParser.json());
@@ -16,31 +14,148 @@ server.use(function(req, res, next) {
 });
 
 var tokenTimeout = 10 * 60; //10 minutes
+var ServerErrorCodes = {
+    NotLoggedIn: 501
+};
 
-server.post('/challengeAnswer', function (req, res) {
+server.post('/cityGuess', function (req, res) {
     var body = req.body;
+    var lat = body.lat;
+    var lng = body.lng;
+    var token = body.token;
 
-    var city = ChallengeData.cities[parseInt(body.id)];
-    var distance = calculateDistance(body.lat, body.lng, city.lat, city.lng);
-    var time = body.time;
-
-    var points = calculatePoints(distance, time);
-
-    console.log("Distance to " + city.name + " is " + Math.round(distance) / 1000 + " km");
-    console.log("Player got " + points + " points");
-
-    res.json({
-        distance: distance,
-        points: points
+    accountController.FetchAccount(token, function(success, account){
+        if(!success){
+            res.json({
+                ErrCode: ServerErrorCodes.NotLoggedIn
+            });
+        }
+        else{
+            var result = ChallengeController.CityGuess(account.userId, lat, lng);
+            res.json(result);
+        }
     });
 });
 
-server.get('/randomChallenge', function (req, res) {
-    var index = Math.trunc(Math.random() * ChallengeData.cities.length);
-    
-    res.json({
-        name: ChallengeData.cities[index].name,
-        id: index
+server.post('/challengeInfo', function(req, res){
+    var body = req.body;
+    var token = body.token;
+    var challengeId = body.challengeId;
+
+    accountController.FetchAccount(token, function(success, account){
+        if(!success){
+            res.json({
+               ErrCode: ServerErrorCodes.NotLoggedIn 
+            });
+        }
+        else{
+            ChallengeController.ChallengeInfo(account.userId, challengeId, function(challenge){
+                res.json(challenge);
+            });
+        }
+    });
+});
+
+server.post('/startChallenge', function(req, res){
+    var body = req.body;
+    var token = body.token;
+    var challengeId = body.challengeId;
+
+    accountController.FetchAccount(token, function(success, account){
+        if(!success){
+            res.json({
+                ErrCode: ServerErrorCodes.NotLoggedIn 
+            });
+        }
+        else{
+            ChallengeController.StartChallenge(account.userId, challengeId, function(challenge){
+                res.json(challenge);
+            });
+        }
+    });
+});
+
+server.post('/syncTimeout', function(req, res){
+    var body = req.body;
+    var token = body.token;
+
+    accountController.FetchAccount(token, function(success, account){
+        if(!success){
+            res.json({
+                ErrCode: ServerErrorCodes.NotLoggedIn 
+            });
+        }
+        else{
+            var result = ChallengeController.SyncTimeout(account.userId);
+            res.json(result);
+        }
+    });
+});
+
+server.post('/nextCity', function(req, res){
+    var body = req.body;
+    var token = body.token;
+
+    accountController.FetchAccount(token, function(success, account){
+        if(!success){
+            res.json({
+                ErrCode: ServerErrorCodes.NotLoggedIn
+            });
+        }
+        else{
+            var result = ChallengeController.NextCity(account.userId);
+            res.json(result);
+        }
+    });
+});
+
+server.post('/signup', function(req, res){
+    var body = req.body;
+    var email = body.email;
+    var passHash = body.passHash;
+
+    accountController.SignUp(email, passHash, function(message){
+        res.json(message);
+    });
+});
+
+server.post('/login', function(req, res){
+    var body = req.body;
+    var email = body.email;
+    var passHash = body.passHash;
+
+    accountController.Login(email, passHash, function(success, account){
+        if(!success){
+            res.json({
+                success: false,
+                token: "" 
+            });
+        }
+        else{
+            res.json({
+                success: true,
+                token: account.token
+            });
+        }
+    });
+});
+
+server.post('/logout', function(req, res){
+    var body = req.body;
+    var token = body.token;
+
+    accountController.LogOut(token, function(success){
+        res.json({
+            success: success
+        })
+    });
+});
+
+server.get('/verifyAccount/:hash', function(req, res){
+    var hash = req.params.hash;
+
+    accountController.Verify(hash, function(){
+        
     });
 });
 
@@ -50,58 +165,6 @@ server.get('/image/:path', function (req, res) {
             res.status(500).send(err);
         }
         res.status(200).send(data);
-    });
-});
-
-server.post('/signup', function(req, res){
-    var body = req.body;
-
-    loginController.SignUp(body.email, body.passHash, function(message){
-        res.json({
-            success: message.success
-        })
-    });
-});
-
-server.post('/login', function(req, res){
-    var body = req.body;
-
-    var email = body.email;
-    var passHash = body.passHash;
-
-    loginController.LogIn(email, passHash, tokenTimeout, function(message){
-        res.json({
-            success: message.success,
-            token: message.token
-        });
-    });
-});
-
-server.get('/verifyAccount/:hash', function(req, res){
-    var hash = req.params.hash;
-
-    loginController.Verify(hash, function(message){
-        res.json({
-            success: message.success 
-        });
-    });
-});
-
-server.get('/getAllAccounts', function(req, res){
-
-    li.FindAll(function(success, docs){
-        if(success){
-            res.json({
-                success: true,
-                docs: docs
-            });
-        }
-        else{
-            res.json({
-                success: false,
-                docs: []
-            });
-        }
     });
 });
 
