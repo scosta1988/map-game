@@ -109,6 +109,24 @@ server.post('/nextCity', function(req, res){
     });
 });
 
+server.post('/getFinalScore', function(req, res){
+    var body = req.body;
+    var token = body.token;
+
+    accountController.FetchAccount(token, function(success, account){
+        if(!success){
+            res.json({
+                ErrCode: ServerErrorCodes.NotLoggedIn
+            });
+        }
+        else{
+            var result = ChallengeController.GetFinalScore(account.userId, function(result){
+                res.json(result);
+            });
+        }
+    });
+});
+
 server.post('/signup', function(req, res){
     var body = req.body;
     var email = body.email;

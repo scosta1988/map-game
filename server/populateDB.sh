@@ -1,5 +1,5 @@
 mongo mapgame --eval "db.City.drop()"
-mongo mapgame --eval "db.City.insertOne({name:'Berlin',lat:52.516667,lng:13383333,range:5000})"
+mongo mapgame --eval "db.City.insertOne({name:'Berlin',lat:52.516667,lng:13.383333,range:5000})"
 mongo mapgame --eval "db.City.insertOne({name:'Paris',lat: 48.8567,lng: 2.3508,range: 5000})"
 mongo mapgame --eval "db.City.insertOne({name:'São Paulo',lat: -23.55,lng: -46.633333,range: 5000})"
 mongo mapgame --eval "db.City.insertOne({name:'Edimburgh',lat: 55.953056,lng: -3.188889,range: 5000})"

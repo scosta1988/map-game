@@ -108,7 +108,7 @@ function CityGuess(userId, lat, lng){
             });
         }
         else{
-            cb(challenge.CityGuess(lat, lng));
+            return challenge.CityGuess(lat, lng);
         }
     }
 }
@@ -119,7 +119,7 @@ function NextCity(userId){
     if(challenge == null){
         return({
             ErrCode: ErrorCodes.NotFound,
-            City: {},
+            CityName: "",
             Timeout: 0,
             MapCentering: {
                 lat: 0,
@@ -129,7 +129,7 @@ function NextCity(userId){
         });
     }
     else{
-        cb(challenge.NextCity());
+        return(challenge.NextCity());
     }
 }
 
@@ -193,8 +193,12 @@ function calculateDistance(lat1, lng1, lat2, lng2) {
     return angle * earthRadius;
 }
 
-function calculatePoints(distance, timeout) {
-    return distance * timeout;
+function calculatePoints(distance, range, timeout) {
+    if(distance - range <= 0.001){
+        //Bull's Eye
+        distance = 0.001;
+    }
+    return timeout / distance;
 }
 
 function toRadians(angle) {
@@ -244,6 +248,10 @@ function ChallengeController(userId, challengeModel){
     this.EndChallenge = function(){
         clearInterval(this.challengeSyncInterval);
         this.challengeEnded = true;
+        setTimeout(function(){
+            var index = challengeArray.indexOf(this, 0);
+            challengeArray.splice(index, 1);
+        }.bind(this), 10000)
     }
 }
 
@@ -262,7 +270,7 @@ ChallengeController.prototype.CityGuess = function(lat, lng){
     }
     else{
         var distance = calculateDistance(lat, lng, currentCity.lat, currentCity.lng);
-        var points = calculatePoints(distance);
+        var points = calculatePoints(distance, currentCity.range, this.currentTimeout);
 
         this.score.overallScore += points;
         this.score.individualScore.push(points);
@@ -308,7 +316,7 @@ ChallengeController.prototype.NextCity = function(){
     if(this.challengeEnded){
         return({
             ErrCode: ErrorCodes.EndChallenge,
-            City: {},
+            CityName: "",
             Timeout: 0,
             MapCentering: {
                 lat: 0,
@@ -322,7 +330,7 @@ ChallengeController.prototype.NextCity = function(){
         if(currentCity == null){
             return({
                 ErrCode: ErrorCodes.Cooldown,
-                City: {},
+                CityName: "",
                 Timeout: this.currentTimeout,
                 MapCentering: {
                     lat: 0,
@@ -334,7 +342,7 @@ ChallengeController.prototype.NextCity = function(){
         else{
             return({
                 ErrCode: ErrorCodes.OK,
-                City: currentCity,
+                CityName: currentCity.name,
                 Timeout: this.currentTimeout,
                 MapCentering: {
                     lat: 0,
@@ -346,13 +354,14 @@ ChallengeController.prototype.NextCity = function(){
     }
 }
 
+//Uses a Callback as return due to a future fetching of the ranks
 ChallengeController.prototype.GetFinalScore = function(cb){
     if(!this.challengeEnded){
         cb({
             ErrCode: ErrorCodes.ChallengeOngoing,
             Points: 0,
             Grade: 0,
-            Ranks: 0
+            Ranks: []
         });
     }
     else{
@@ -360,7 +369,7 @@ ChallengeController.prototype.GetFinalScore = function(cb){
             ErrCode: ErrorCodes.OK,
             Points: this.score.overallScore,
             Grade: 0,
-            Ranks: 0
+            Ranks: []
         })
     }
 }
