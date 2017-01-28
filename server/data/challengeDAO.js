@@ -123,7 +123,7 @@ var ChallengeDAO = {
             else{
                 db.collection(DataConstants.Collections.CHALLENGE)
                     .find({_id: ObjectID(id)}).limit(1).next(function(err, doc){
-                        if(err != null){
+                        if(err != null || doc == null){
                             cb(false, null);
                         }
                         else{

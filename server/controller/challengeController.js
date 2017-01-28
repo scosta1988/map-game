@@ -38,7 +38,7 @@ function ChallengeInfo(userId, challengeId, cb){
 }
 
 function StartChallenge(userId, challengeId, cb){
-    if(GetChallengeByUserId != null){
+    if(GetChallengeByUserId(userId) != null){
         cb({
             ErrCode: ErrorCodes.ChallengeOngoing,
             City: {},
@@ -51,7 +51,7 @@ function StartChallenge(userId, challengeId, cb){
         });
     }
     else{
-        ChallengeDAO.FindById(challenge, function(success, challenge){
+        ChallengeDAO.FindById(challengeId, function(success, challenge){
             if(!success){
                 cb({
                     ErrCode: ErrorCodes.NotFound,
@@ -82,7 +82,7 @@ function SyncTimeout(userId){
         });
     }
     else{
-        cb(challenge.SyncTimeout());
+        return(challenge.SyncTimeout());
     }
 }
 
@@ -219,20 +219,21 @@ function ChallengeController(userId, challengeModel){
     this.challengeEnded = false;
 
     this.challengeSyncInterval = setInterval(function(){
-        currentTimeout--;
-        if(currentTimeout == 0){
-            if(currentCity == null){
-                currentCity = listOfCities[progress];
-                currentTimeout = timeout;
+        this.currentTimeout--;
+        console.log(this.userId + " Challenge - City: " + (this.currentCity ? this.currentCity.name : "") + " - Timeout: " + this.currentTimeout);
+        if(this.currentTimeout == 0){
+            if(this.currentCity == null){
+                this.currentCity = this.listOfCities[this.progress];
+                this.currentTimeout = this.timeout;
             }
             else{
-                progress++;
-                if(progress < listOfCities.length){
-                    currentCity = null;
-                    currentTimeout = cooldown;
+                this.progress++;
+                if(this.progress < this.listOfCities.length){
+                    this.currentCity = null;
+                    this.currentTimeout = this.cooldown;
                 }
                 else{
-                    EndChallenge();
+                   this.EndChallenge();
                 }
             }
         }
@@ -240,8 +241,9 @@ function ChallengeController(userId, challengeModel){
 
     challengeArray.push(this);
 
-    function EndChallenge(){
-        challengeEnded = true;
+    this.EndChallenge = function(){
+        clearInterval(this.challengeSyncInterval);
+        this.challengeEnded = true;
     }
 }
 

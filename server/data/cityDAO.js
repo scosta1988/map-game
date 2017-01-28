@@ -1,4 +1,5 @@
 var mongo = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 var DataConstants = require('./dataConstants');
 
 var CityDAO = {
@@ -82,7 +83,7 @@ var CityDAO = {
             }
             else{
                 db.collection(DataConstants.Collections.CITY)
-                    .find({_id: id}).limit(1).next(function(err, doc){
+                    .find({_id: ObjectID(id)}).limit(1).next(function(err, doc){
                         if(err != null){
                             cb(false, null);
                         }
