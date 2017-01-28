@@ -38,7 +38,7 @@ function ChallengeInfo(userId, challengeId, cb){
 }
 
 function StartChallenge(userId, challengeId, cb){
-    if(GetChallengeByUserId != null){
+    if(GetChallengeByUserId(userId) != null){
         cb({
             ErrCode: ErrorCodes.ChallengeOngoing,
             City: {},
@@ -51,7 +51,7 @@ function StartChallenge(userId, challengeId, cb){
         });
     }
     else{
-        ChallengeDAO.FindById(challenge, function(success, challenge){
+        ChallengeDAO.FindById(challengeId, function(success, challenge){
             if(!success){
                 cb({
                     ErrCode: ErrorCodes.NotFound,
@@ -82,7 +82,7 @@ function SyncTimeout(userId){
         });
     }
     else{
-        cb(challenge.SyncTimeout());
+        return(challenge.SyncTimeout());
     }
 }
 
@@ -108,7 +108,7 @@ function CityGuess(userId, lat, lng){
             });
         }
         else{
-            cb(challenge.CityGuess(lat, lng));
+            return challenge.CityGuess(lat, lng);
         }
     }
 }
@@ -119,7 +119,7 @@ function NextCity(userId){
     if(challenge == null){
         return({
             ErrCode: ErrorCodes.NotFound,
-            City: {},
+            CityName: "",
             Timeout: 0,
             MapCentering: {
                 lat: 0,
@@ -129,7 +129,7 @@ function NextCity(userId){
         });
     }
     else{
-        cb(challenge.NextCity());
+        return(challenge.NextCity());
     }
 }
 
@@ -193,8 +193,12 @@ function calculateDistance(lat1, lng1, lat2, lng2) {
     return angle * earthRadius;
 }
 
-function calculatePoints(distance, timeout) {
-    return distance * timeout;
+function calculatePoints(distance, range, timeout) {
+    if(distance - range <= 0.001){
+        //Bull's Eye
+        distance = 0.001;
+    }
+    return timeout / distance;
 }
 
 function toRadians(angle) {
@@ -203,45 +207,51 @@ function toRadians(angle) {
 
 //Class
 function ChallengeController(userId, challengeModel){
-    var userId = userId;
-    var listOfCities = challengeModel.listOfCities;
-    var currentCity = challengeModel.listOfCities[0];
-    var progress = 0;
-    var timeout = challengeModel.timeout;
-    var cooldown = challengeModel.cooldown;
+    this.userId = userId;
+    this.listOfCities = challengeModel.listOfCities;
+    this.currentCity = challengeModel.listOfCities[0];
+    this.progress = 0;
+    this.timeout = challengeModel.timeout;
+    this.cooldown = challengeModel.cooldown;
 
-    var currentTimeout = challengeModel.timeout;
-    var score = {
+    this.currentTimeout = challengeModel.timeout;
+    this.score = {
         overallScore: 0,
         individualScore: []
     }
 
-    var challengeEnded = false;
+    this.challengeEnded = false;
 
-    var challengeSyncInterval = setInterval(function(){
-        currentTimeout--;
-        if(currentTimeout == 0){
-            if(currentCity == null){
-                currentCity = listOfCities[progress];
-                currentTimeout = timeout;
+    this.challengeSyncInterval = setInterval(function(){
+        this.currentTimeout--;
+        console.log(this.userId + " Challenge - City: " + (this.currentCity ? this.currentCity.name : "") + " - Timeout: " + this.currentTimeout);
+        if(this.currentTimeout == 0){
+            if(this.currentCity == null){
+                this.currentCity = this.listOfCities[this.progress];
+                this.currentTimeout = this.timeout;
             }
             else{
-                progress++;
-                if(progress < listOfCities.length){
-                    currentCity = null;
-                    currentTimeout = cooldown;
+                this.progress++;
+                if(this.progress < this.listOfCities.length){
+                    this.currentCity = null;
+                    this.currentTimeout = this.cooldown;
                 }
                 else{
-                    EndChallenge();
+                   this.EndChallenge();
                 }
             }
         }
-    }, 1000);
+    }.bind(this), 1000);
 
     challengeArray.push(this);
 
-    function EndChallenge(){
-        challengeEnded = true;
+    this.EndChallenge = function(){
+        clearInterval(this.challengeSyncInterval);
+        this.challengeEnded = true;
+        setTimeout(function(){
+            var index = challengeArray.indexOf(this, 0);
+            challengeArray.splice(index, 1);
+        }.bind(this), 10000)
     }
 }
 
@@ -260,7 +270,7 @@ ChallengeController.prototype.CityGuess = function(lat, lng){
     }
     else{
         var distance = calculateDistance(lat, lng, currentCity.lat, currentCity.lng);
-        var points = calculatePoints(distance);
+        var points = calculatePoints(distance, currentCity.range, this.currentTimeout);
 
         this.score.overallScore += points;
         this.score.individualScore.push(points);
@@ -306,7 +316,7 @@ ChallengeController.prototype.NextCity = function(){
     if(this.challengeEnded){
         return({
             ErrCode: ErrorCodes.EndChallenge,
-            City: {},
+            CityName: "",
             Timeout: 0,
             MapCentering: {
                 lat: 0,
@@ -320,7 +330,7 @@ ChallengeController.prototype.NextCity = function(){
         if(currentCity == null){
             return({
                 ErrCode: ErrorCodes.Cooldown,
-                City: {},
+                CityName: "",
                 Timeout: this.currentTimeout,
                 MapCentering: {
                     lat: 0,
@@ -332,7 +342,7 @@ ChallengeController.prototype.NextCity = function(){
         else{
             return({
                 ErrCode: ErrorCodes.OK,
-                City: currentCity,
+                CityName: currentCity.name,
                 Timeout: this.currentTimeout,
                 MapCentering: {
                     lat: 0,
@@ -344,13 +354,14 @@ ChallengeController.prototype.NextCity = function(){
     }
 }
 
+//Uses a Callback as return due to a future fetching of the ranks
 ChallengeController.prototype.GetFinalScore = function(cb){
     if(!this.challengeEnded){
         cb({
             ErrCode: ErrorCodes.ChallengeOngoing,
             Points: 0,
             Grade: 0,
-            Ranks: 0
+            Ranks: []
         });
     }
     else{
@@ -358,7 +369,7 @@ ChallengeController.prototype.GetFinalScore = function(cb){
             ErrCode: ErrorCodes.OK,
             Points: this.score.overallScore,
             Grade: 0,
-            Ranks: 0
+            Ranks: []
         })
     }
 }

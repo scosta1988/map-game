@@ -5,10 +5,10 @@ var createdTokenTimeout = 3600 * 24 * 30 * 6; //6 months
 var lastAccessTokenTimeout = 3600 * 24 * 30; //1 month
 
 function AccountController(){
-    var LoggedInArray = [];
-    var loginController = new LoginController();
+    this.LoggedInArray = [];
+    this.loginController = new LoginController();
 
-    var LoggedInArrayMgmtInterval = setInterval(this.CleanLoggedInArray, 5000);
+    this.LoggedInArrayMgmtInterval = setInterval(this.CleanLoggedInArray.bind(this), 5000);
 }
 
 function IsTokenValid(createdDate, lastAccess){
@@ -20,7 +20,8 @@ function IsTokenValid(createdDate, lastAccess){
 }
 
 AccountController.prototype.FetchAccount = function(token, cb){
-    var account = this.LoggedInArray.find(function(element){
+    var LoggedInArray = this.LoggedInArray;
+    var account = LoggedInArray.find(function(element){
         return element.token == token;
     });
 
@@ -31,13 +32,13 @@ AccountController.prototype.FetchAccount = function(token, cb){
             }
             else{
                 if(IsTokenValid(doc.createdDate, doc.lastAccess)){
-                    AccountDAO.FindByToken(message.token, function(success, doc){
+                    AccountDAO.FindByToken(doc.token, function(success, doc){
                         if(!success){
                             console.log("Error retrieving user information");
                             cb(false, null);
                         }
                         else{
-                            this.LoggedInArray.push(doc);
+                            LoggedInArray.push(doc);
                             cb(true, doc);
                         }
                     });
@@ -54,20 +55,29 @@ AccountController.prototype.FetchAccount = function(token, cb){
 }
 
 AccountController.prototype.Login = function(email, passHash, cb){
-    this.loginController.LogIn(email, passHash, function(message){
+    var LoggedInArray = this.LoggedInArray;
+    this.loginController.Login(email, passHash, function(message){
         if(!message.success){
             console.log("Error with login");
             cb(false, null);
         }
         else{
-            AccountDAO.FindByToken(message.token, function(success, doc){
+            AccountDAO.FindByEmail(email, function(success, doc){
                 if(!success){
                     console.log("Error retrieving user information");
                     cb(false, null);
                 }
                 else{
-                    this.LoggedInArray.push(doc);
-                    cb(true, doc);
+                    doc.token = message.token;
+                    AccountDAO.UpdateToken(email, doc.token, function(success){
+                        if(!success){
+                            cb(false, null);
+                        }
+                        else{
+                            LoggedInArray.push(doc);
+                            cb(true, doc);
+                        }
+                    });
                 }
             });
         }
@@ -75,13 +85,14 @@ AccountController.prototype.Login = function(email, passHash, cb){
 }
 
 AccountController.prototype.LogOut = function(token, cb){
+    var LoggedInArray = this.LoggedInArray;
     this.loginController.LogOut(token, function(success){
         if(success){
-            var idx = this.LoggedInArray.indexOf(function(element, index, array){
+            var idx = LoggedInArray.indexOf(function(element, index, array){
                 return element.token == token;
             });
             if(idx != -1){
-                this.LoggedInArray.splice(idx, 1);
+                LoggedInArray.splice(idx, 1);
             }
             cb(true);
         }
@@ -101,8 +112,8 @@ AccountController.prototype.Verify = function(hash, cb){
     this.loginController.Verify(hash, function(message){
         if(message.success){
             var loginInformation = message.loginInformation;
-            AccountDAO.Create(loginController.email, loginController.name, loginController.token,
-                              loginController.userId, function(success, insertedId){
+            AccountDAO.Create(loginInformation.email, loginInformation.name, loginInformation.token,
+                              loginInformation.email, function(success, insertedId){
                                   if(success){
                                       cb(true);
                                   }
@@ -143,3 +154,5 @@ AccountController.prototype.CleanLoggedInArray = function(){
         }
     }
 }
+
+module.exports = AccountController;
