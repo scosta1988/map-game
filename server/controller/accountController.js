@@ -21,7 +21,7 @@ function IsTokenValid(createdDate, lastAccess){
 
 AccountController.prototype.FetchAccount = function(token, cb){
     var LoggedInArray = this.LoggedInArray;
-    var account = this.LoggedInArray.find(function(element){
+    var account = LoggedInArray.find(function(element){
         return element.token == token;
     });
 
@@ -32,7 +32,7 @@ AccountController.prototype.FetchAccount = function(token, cb){
             }
             else{
                 if(IsTokenValid(doc.createdDate, doc.lastAccess)){
-                    AccountDAO.FindByToken(message.token, function(success, doc){
+                    AccountDAO.FindByToken(doc.token, function(success, doc){
                         if(!success){
                             console.log("Error retrieving user information");
                             cb(false, null);
@@ -85,13 +85,14 @@ AccountController.prototype.Login = function(email, passHash, cb){
 }
 
 AccountController.prototype.LogOut = function(token, cb){
+    var LoggedInArray = this.LoggedInArray;
     this.loginController.LogOut(token, function(success){
         if(success){
-            var idx = this.LoggedInArray.indexOf(function(element, index, array){
+            var idx = LoggedInArray.indexOf(function(element, index, array){
                 return element.token == token;
             });
             if(idx != -1){
-                this.LoggedInArray.splice(idx, 1);
+                LoggedInArray.splice(idx, 1);
             }
             cb(true);
         }

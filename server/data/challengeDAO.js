@@ -1,6 +1,8 @@
 var mongo = require('mongodb').MongoClient;
 var DataConstants = require('./dataConstants');
 var CityDAO = require('./cityDAO');
+var ObjectID = require('mongodb').ObjectID;
+var async = require('async');
 
 var ChallengeDAO = {
     Create: function(name, listOfCities, description, picturesUrls, ranks, grades, timeout, cooldown, mapCentering, cb){
@@ -120,22 +122,31 @@ var ChallengeDAO = {
             }
             else{
                 db.collection(DataConstants.Collections.CHALLENGE)
-                    .find({_id: id}).limit(1).next(function(err, doc){
+                    .find({_id: ObjectID(id)}).limit(1).next(function(err, doc){
                         if(err != null){
                             cb(false, null);
                         }
                         else{
+                            //synchronization
+                            var calls = [];
+
                             var cityList = [];
                             doc.listOfCities.forEach(function(element) {
-                                CityDAO.FindByName(element, function(success, city){
-                                    if(success){
-                                        cityList.push(city);
-                                    }
+                                calls.push(function(callback){
+                                    CityDAO.FindByName(element, function(success, city){
+                                        if(success){
+                                            cityList.push(city);
+                                            callback(null);
+                                        }
+                                    });
                                 });
-                            }, this);
+                                
+                            });
 
-                            doc.listOfCities = cityList;
-                            cb(true, doc);
+                            async.parallel(calls, function(err, result) {
+                                doc.listOfCities = cityList;
+                                cb(true, doc);
+                            });
                         }
                     });
             }
