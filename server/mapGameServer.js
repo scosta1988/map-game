@@ -47,7 +47,7 @@ server.post('/challengeInfo', function(req, res){
     accountController.FetchAccount(token, function(success, account){
         if(!success){
             res.json({
-               ErrCode: ServerErrorCodes.NotLoggedIn 
+               ErrCode: ServerErrorCodes.NotLoggedIn
             });
         }
         else{
@@ -66,7 +66,7 @@ server.post('/startChallenge', function(req, res){
     accountController.FetchAccount(token, function(success, account){
         if(!success){
             res.json({
-                ErrCode: ServerErrorCodes.NotLoggedIn 
+                ErrCode: ServerErrorCodes.NotLoggedIn
             });
         }
         else{
@@ -84,7 +84,7 @@ server.post('/syncTimeout', function(req, res){
     accountController.FetchAccount(token, function(success, account){
         if(!success){
             res.json({
-                ErrCode: ServerErrorCodes.NotLoggedIn 
+                ErrCode: ServerErrorCodes.NotLoggedIn
             });
         }
         else{
@@ -151,7 +151,7 @@ server.post('/login', function(req, res){
         if(!success){
             res.json({
                 success: false,
-                token: "" 
+                token: ""
             });
         }
         else{
