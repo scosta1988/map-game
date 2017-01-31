@@ -42,5 +42,8 @@ server/db
 #Hide email account data
 server/controller/secretData.js
 
+#Hide distribution
+map-trial/dist
+
 #VSCode settings
 .vscode
