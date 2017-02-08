@@ -23,33 +23,50 @@
 </header>
 
 <template #loginModal let-c="close" let-d="dismiss">
-    <div class="modal-header">
-    <h4 class="modal-title">Modal title</h4>
-    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>Login Modal</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
-  </div>
+    <div class="modal-header container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h4 class="modal-title">Login</h4>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body container-fluid">
+        <div class="row">
+            <div class="col-3">
+                <p>Email:</p>
+            </div>
+            <div class="col-9">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <p>Password:</p>
+            </div>
+            <div class="col-9">
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+    </div>
 </template>
 
 <template #signupModal let-c="close" let-d="dismiss">
-    <div class="modal-header">
-    <h4 class="modal-title">Modal title</h4>
-    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>Signup Modal</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
-  </div>
+    <div class="modal-header container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h4 class="modal-title">Sign Up</h4>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body">
+        <p>Signup Modal</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+    </div>
 </template>
 
 <template ngbModalContainer></template>
