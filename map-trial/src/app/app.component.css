@@ -5,3 +5,11 @@
 .modal-title{
     font-size: 30px;
 }
+
+.progress-bar {
+    vertical-align: middle;
+}
+
+.progress {
+    transform: matrix(1, 0, 0, 3.2, 0, 18);
+}

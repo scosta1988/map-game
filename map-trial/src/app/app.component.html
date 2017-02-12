@@ -1,22 +1,40 @@
 <header class="jumbotron" style="background-color: #F43737">
     <div class="container">
         <div class="row">
-            <div class="col-9">
+            <div class="col-8">
                 <h1>{{ title }}</h1>
             </div>
-            <div class="col-3">
-                <button class="btn btn-labeled btn-success"
-                        (click)="openLoginModal(loginModal)">
-                    <h4>
-                        Log In
-                    </h4>
-                </button>
-                <button class="btn btn-labeled btn-primary"
-                        (click)="openSignupModal(signupModal)">
-                    <h4>
-                        Sign Up
-                    </h4>
-                </button>
+
+            <div class="col-2">
+                <div *ngIf="isLoggingIn == false">
+                    <button class="btn btn-success" style="width: 100%"
+                        (click)="isSigningUp == false && openLoginModal(loginModal)"
+                        [ngClass]="{disabled: isSigningUp}">
+                        <h4>
+                            Log In
+                        </h4>
+                    </button>
+                </div>
+                <div *ngIf="isLoggingIn == true">
+                    <ngb-progressbar value="1" type="success">
+                    </ngb-progressbar>
+                </div>
+            </div>
+
+            <div class="col-2">
+                <div *ngIf="isSigningUp == false">
+                    <button class="btn  btn-primary" style="width: 100%"
+                            (click)="isLoggingIn == false && openSignupModal(signupModal)"
+                            [ngClass]="{disabled: isLoggingIn}">
+                            <h4>
+                                Sign Up
+                            </h4>
+                    </button>
+                </div>
+                <div *ngIf="isSigningUp == true">
+                    <ngb-progressbar value="1" type="primary">
+                    </ngb-progressbar>
+                </div>
             </div>
         </div>
     </div>
