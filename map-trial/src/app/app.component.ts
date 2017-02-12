@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, Input } from '@angular/core';
 import { MouseEvent } from 'angular2-google-maps/core';
 import { NgbCarouselConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -16,6 +16,8 @@ import 'rxjs/add/operator/map';
 })
 export class AppComponent {
     title: string = 'Map Challenge';
+    email: string = '';
+    password: string = '';
 
     constructor(private config: NgbCarouselConfig,
                 private loginModalService: NgbModal,
@@ -25,14 +27,24 @@ export class AppComponent {
     }
 
     openLoginModal(content){
+        this.email = '';
+        this.password = '';
+
         this.loginModalService.open(content).result.then((result) => {
-            //TODO: Perform Login
+            if(result == 'login'){
+                //TODO: Perform login
+            }
         }, (reason) => {});
     }
 
     openSignupModal(content){
+        this.email = '';
+        this.password = '';
+
         this.signupModalService.open(content).result.then((result) => {
-            //TODO: Perform Signup
+            if(result == 'signup'){
+                //TODO: Perform Signup
+            }
         }, (reason) => {});
     }
 }

@@ -22,7 +22,7 @@
     </div>
 </header>
 
-<template #loginModal let-c="close" let-d="dismiss">
+<template #loginModal let-close="close">
     <div class="modal-header container-fluid">
         <div class="row">
             <div class="col-12">
@@ -30,30 +30,26 @@
             </div>
         </div>
     </div>
-    <div class="modal-body container-fluid">
+    <div class="modal-body">
+        <div class="container">
+            <div class="row">
+                <input type="text" class="col-8" [(ngModel)]="email" placeholder="Email">
+            </div>
         <div class="row">
-            <div class="col-3">
-                <p>Email:</p>
+                <input type="password" class="col-8" [(ngModel)]="password" placeholder="Password">
             </div>
-            <div class="col-9">
-
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-3">
-                <p>Password:</p>
-            </div>
-            <div class="col-9">
-
+            <div class="row">
+                <button type="submit" class="col-3 btn btn-info btn-sm" (click)="close('login')">Login</button>
+                <button type="button" class="col-3 offset-5 btn btn-default btn-sm" data-dismiss="modal" (click)="close('cancel')">Cancel</button>
             </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
-    </div>
+    <!-- TODO: Login with Facebook, Google+, ... -->
+    <!--<div class="modal-footer">
+    </div>-->
 </template>
 
-<template #signupModal let-c="close" let-d="dismiss">
+<template #signupModal let-close="close">
     <div class="modal-header container-fluid">
         <div class="row">
             <div class="col-12">
@@ -62,11 +58,22 @@
         </div>
     </div>
     <div class="modal-body">
-        <p>Signup Modal</p>
+        <div class="container">
+            <div class="row">
+                <input type="text" class="col-8" [(ngModel)]="email" placeholder="Email">
+            </div>
+        <div class="row">
+                <input type="password" class="col-8" [(ngModel)]="password" placeholder="Password">
+            </div>
+            <div class="row">
+                <button type="submit" class="col-3 btn btn-info btn-sm" (click)="close('signup')">Sign Up</button>
+                <button type="button" class="col-3 offset-5 btn btn-default btn-sm" data-dismiss="modal" (click)="close('cancel')">Cancel</button>
+            </div>
+        </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
-    </div>
+    <!-- TODO: Signup with Facebook, Google+, ... -->
+    <!--<div class="modal-footer">
+    </div>-->
 </template>
 
 <template ngbModalContainer></template>
