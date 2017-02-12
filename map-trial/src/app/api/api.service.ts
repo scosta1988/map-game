@@ -6,53 +6,136 @@ import { Observable } from "rxjs/Observable";
 export class ApiService {
     constructor(private http: Http) { }
 
-    getChallenge(): Observable<Challenge> {
-        return this.http.get('http://localhost:4300/randomChallenge')
-            .map(this.handleGetChallenge);
+    login(req: LoginRequest): Observable<LoginResponse>{
+        return this.http.post('http://localhost:4300/login', req)
+                .map(this.handleLoginResponse);
     }
 
-    postChallengeAnswer(ans: Answer): Observable<Result> {
-        return this.http.post('http://localhost:4300/challengeAnswer', ans)
-                 .map(this.handlePostChallengeAnswer);
+    signup(req: SignupRequest): Observable<SignupResponse>{
+        return this.http.post('http://localhost:4300/login', req)
+                .map(this.handleSignupResponse);
     }
 
-    private handleGetChallenge(res: Response) {
+    private handleLoginResponse(res: Response) {
         let body = res.json();
 
-        let challenge: Challenge = {
-            id: body.id,
-            name: body.name
+        let result: LoginResponse = {
+            success: body.success,
+            token: body.token
         };
 
-        return challenge;
+        return result;
     }
 
-    private handlePostChallengeAnswer(res: Response) {
+    private handleSignupResponse(res: Response) {
         let body = res.json();
 
-        let result: Result = {
-            distance: body.distance,
-            points: body.points
+        let result: SignupResponse = {
+            success: body.success
         };
 
         return result;
     }
 }
 
-export class Challenge {
-    id: number;
-    name: string;
-
+export class LoginRequest{
+    email: string;
+    passHash: string;
+}
+export class LoginResponse{
+    success: boolean;
+    token: string;
 }
 
-export class Answer {
-    id: number;
+export class SignupRequest{
+    email: string;
+    passHash: string;
+}
+export class SignupResponse{
+    success: boolean;
+}
+
+export class LogoutRequest{
+    token: string;
+}
+export class LogoutResponse{
+    success: boolean;
+}
+
+export class VerifyAccountRequest{
+    hash: string;
+}
+export class VerifyAccountResponse{
+    success: boolean;
+}
+
+export class CityGuessRequest{
     lat: number;
     lng: number;
-    time: number;
+    token: string;
+}
+export class CityGuessResponse{
+    ErrCode: number;
+    Distance: number;
+    Points: number;
+    Lat: number;
+    Lng: number;
 }
 
-export class Result {
-    distance: number;
-    points: number;
+export class ChallengeInfoRequest{
+    token: string;
+    challengeId: string;
+}
+export class ChallengeInfoResponse{
+    ErrCode: number;
+    ChallengeModel: {
+        Name: string;
+        Description: string;
+        NumOfCities: number;
+        Ranks: string[];
+        PicturesURLs: string[];
+    }
+}
+
+export class StartChallengeRequest{
+    token: string;
+    challengeId: string;
+}
+export class StartChallengeResponse{
+
+}
+
+export class NextCityRequest{
+    token: string;
+}
+export class NextCityResponse{
+    ErrCode: number;
+    CityName: string;
+    Timeout: number;
+    MapCentering: MapCentering;
+}
+
+export class SyncTimeoutRequest{
+    token: string;
+}
+export class SyncTimeoutResponse{
+    ErrCode: number;
+    CityId: string;
+    Timeout: number;
+}
+
+export class GetFinalScoreRequest{
+    token: string;
+}
+export class GetFinalScoreResponse{
+
+}
+
+export class MapCentering{
+    lat: number;
+    lng: number;
+    zoom: number;
+}
+export class City{
+
 }
