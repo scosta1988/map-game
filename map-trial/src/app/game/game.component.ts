@@ -3,7 +3,7 @@ import { MouseEvent } from 'angular2-google-maps/core';
 
 import 'rxjs/add/operator/map';
 
-import { ApiService, Challenge, Answer, Result } from "../api/api.service";
+import { ApiService } from "../api/api.service";
 
 @Component({
   selector: 'game-root',
@@ -13,7 +13,7 @@ import { ApiService, Challenge, Answer, Result } from "../api/api.service";
 })
 export class GameComponent implements OnInit {
   title: string = 'Map Challenge';
-  
+
   lat: number = 51.678418;
   lng: number = 7.809007;
   distance: number = 0;
@@ -24,14 +24,14 @@ export class GameComponent implements OnInit {
   constructor(private apiService: ApiService){}
 
   ngOnInit() {
-    this.apiService.getChallenge()
+    /*this.apiService.getChallenge()
                    .subscribe(
                      challenge => {
                        this.cityId = challenge.id;
                        this.cityName = challenge.name;
                        this.timeStampStart = Date.now();
                      }
-                   );
+                 );*/
   }
 
   mapClick($event : MouseEvent)
@@ -41,7 +41,7 @@ export class GameComponent implements OnInit {
 
     let time = Date.now() - this.timeStampStart;
 
-    let answer: Answer ={
+    /*let answer: Answer ={
       id: this.cityId,
       lat: this.lat,
       lng: this.lng,
@@ -53,8 +53,7 @@ export class GameComponent implements OnInit {
                      result => {
                        this.distance = Math.round(result.distance) / 1000;
                      }
-                   );
+                 );*/
   }
 
-  private 
 }

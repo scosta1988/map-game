@@ -4,6 +4,9 @@ import { NgbCarouselConfig, NgbModal, NgbProgressbarConfig } from '@ng-bootstrap
 
 import 'rxjs/add/operator/map';
 
+import { ApiService, LoginRequest, LoginResponse,
+         SignupRequest, SignupResponse } from './api/api.service';
+
 @Component({
   selector: 'app-root',
   encapsulation: ViewEncapsulation.None,
@@ -25,7 +28,8 @@ export class AppComponent {
     constructor(private config: NgbCarouselConfig,
                 private loginModalService: NgbModal,
                 private signupModalService: NgbModal,
-                private progressBarsConfig: NgbProgressbarConfig){
+                private progressBarsConfig: NgbProgressbarConfig,
+                private apiService: ApiService){
 
         config.interval = 7000;
 
@@ -41,11 +45,19 @@ export class AppComponent {
 
         this.loginModalService.open(content).result.then((result) => {
             if(result == 'login'){
-                var self = this;
-                self.isLoggingIn = true;
-                setTimeout(function(){
-                    self.isLoggingIn = false;
-                }, 5000);
+                this.isLoggingIn = true;
+
+                //TODO: hash password
+                let req: LoginRequest = {
+                    email: this.email,
+                    passHash: this.password
+                };
+
+                this.apiService.login(req)
+                    .subscribe(res => {
+                        let loginResponse: LoginResponse = res as LoginResponse;
+                        this.isLoggingIn = false;
+                    });
             }
         }, (reason) => {});
     }
@@ -56,11 +68,18 @@ export class AppComponent {
 
         this.signupModalService.open(content).result.then((result) => {
             if(result == 'signup'){
-                var self = this;
-                self.isSigningUp = true;
-                setTimeout(function(){
-                    self.isSigningUp = false;
-                }, 5000);
+                this.isSigningUp = true;
+
+                let req: SignupRequest = {
+                    email: this.email,
+                    passHash: this.password
+                };
+
+                this.apiService.signup(req)
+                    .subscribe(res => {
+                        let signupResponse: SignupResponse = res as SignupResponse;
+                        this.isSigningUp = false;
+                    });
             }
         }, (reason) => {});
     }
