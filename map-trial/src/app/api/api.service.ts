@@ -16,25 +16,94 @@ export class ApiService {
                 .map(this.handleSignupResponse);
     }
 
-    private handleLoginResponse(res: Response) {
-        let body = res.json();
-
-        let result: LoginResponse = {
-            success: body.success,
-            token: body.token
-        };
-
-        return result;
+    logout(req: LogoutRequest): Observable<LogoutResponse>{
+        return this.http.post('http://localhost:4300/logout', req)
+                .map(this.handleLogoutResponse);
     }
 
-    private handleSignupResponse(res: Response) {
+    verifyAccount(req: VerifyAccountRequest): Observable<VerifyAccountResponse>{
+        return this.http.get('http://localhost:4300/verifyAccount/' + req.hash)
+                .map(this.handleVerifyAccountResponse);
+    }
+
+    challengeInfo(req: ChallengeInfoRequest): Observable<ChallengeInfoResponse>{
+        return this.http.post('http://localhost:4300/challengeInfo', req)
+                .map(this.handleChallengeInfoResponse);
+    }
+
+    startChallenge(req: StartChallengeRequest): Observable<StartChallengeResponse>{
+        return this.http.post('http://localhost:4300/startChallenge', req)
+                .map(this.handleStartChallengeResponse);
+    }
+
+    cityGuess(req: CityGuessRequest): Observable<CityGuessResponse>{
+        return this.http.post('http://localhost:4300/cityGuess', req)
+                .map(this.handleCityGuessResponse);
+    }
+
+    nextCity(req: NextCityRequest): Observable<NextCityResponse>{
+        return this.http.post('http://localhost:4300/nextCity', req)
+                .map(this.handleNextCityResponse);
+    }
+
+    syncTimeout(req: SyncTimeoutRequest): Observable<SyncTimeoutResponse>{
+        return this.http.post('http://localhost:4300/syncTimeout', req)
+                .map(this.handleSyncTimeoutResponse);
+    }
+
+    getFinalScore(req: GetFinalScoreRequest): Observable<GetFinalScoreResponse>{
+        return this.http.post('http://localhost:4300/getFinalScore', req)
+                .map(this.handleGetFinalScoreResponse);
+    }
+
+    private handleLoginResponse(res: Response): LoginResponse {
         let body = res.json();
+        return body as LoginResponse;
+    }
 
-        let result: SignupResponse = {
-            success: body.success
-        };
+    private handleSignupResponse(res: Response): SignupResponse {
+        let body = res.json();
+        return body as SignupResponse;
+    }
 
-        return result;
+    private handleLogoutResponse(res: Response): LogoutResponse{
+        let body = res.json();
+        return body as LogoutResponse;
+    }
+
+    private handleVerifyAccountResponse(res: Response): VerifyAccountResponse{
+        let body = res.json();
+        return body as VerifyAccountResponse;
+    }
+
+    private handleChallengeInfoResponse(res: Response): ChallengeInfoResponse{
+        let body = res.json();
+        return body as ChallengeInfoResponse;
+    }
+
+    private handleStartChallengeResponse(res: Response): StartChallengeResponse{
+        let body = res.json();
+        return body as StartChallengeResponse;
+    }
+
+    private handleCityGuessResponse(res: Response): CityGuessResponse{
+        let body = res.json();
+        return body as CityGuessResponse;
+    }
+
+    private handleNextCityResponse(res: Response): NextCityResponse{
+        let body = res.json();
+        return body as NextCityResponse;
+    }
+
+    private handleSyncTimeoutResponse(res: Response): SyncTimeoutResponse{
+        let body = res.json();
+        return body as SyncTimeoutResponse;
+    }
+
+    private handleGetFinalScoreResponse(res: Response): GetFinalScoreResponse{
+        let body = res.json();
+        return body as GetFinalScoreResponse;
     }
 }
 
@@ -92,7 +161,7 @@ export class ChallengeInfoResponse{
         Name: string;
         Description: string;
         NumOfCities: number;
-        Ranks: string[];
+        Ranks: Rank[];
         PicturesURLs: string[];
     }
 }
@@ -102,7 +171,10 @@ export class StartChallengeRequest{
     challengeId: string;
 }
 export class StartChallengeResponse{
-
+    ErrCode: number;
+    CityName: string;
+    Timeout: number;
+    MapCentering: MapCentering;
 }
 
 export class NextCityRequest{
@@ -128,7 +200,10 @@ export class GetFinalScoreRequest{
     token: string;
 }
 export class GetFinalScoreResponse{
-
+    ErrCode: number;
+    Points: number;
+    Grade: number;
+    Ranks: Rank[];
 }
 
 export class MapCentering{
@@ -136,6 +211,5 @@ export class MapCentering{
     lng: number;
     zoom: number;
 }
-export class City{
-
-}
+export class City{}
+export class Rank{}

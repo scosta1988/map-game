@@ -41,7 +41,7 @@ function StartChallenge(userId, challengeId, cb){
     if(GetChallengeByUserId(userId) != null){
         cb({
             ErrCode: ErrorCodes.ChallengeOngoing,
-            City: {},
+            CityName: "",
             Timeout: 0,
             MapCentering: {
                 lat: 0,
@@ -55,7 +55,7 @@ function StartChallenge(userId, challengeId, cb){
             if(!success){
                 cb({
                     ErrCode: ErrorCodes.NotFound,
-                    City: {},
+                    CityName: "",
                     Timeout: 0,
                     MapCentering: {
                         lat: 0,
