@@ -4,13 +4,14 @@ import { NgbCarouselConfig, NgbModal, NgbProgressbarConfig } from '@ng-bootstrap
 
 import 'rxjs/add/operator/map';
 
+import { Utils } from './utils/utils';
 import { ApiService, LoginRequest, LoginResponse,
          SignupRequest, SignupResponse } from './api/api.service';
 
 @Component({
   selector: 'app-root',
   encapsulation: ViewEncapsulation.None,
-  providers: [NgbCarouselConfig],
+  providers: [NgbCarouselConfig, ApiService],
   templateUrl: './app.component.html',
   styleUrls: [
       './app.component.css',
@@ -47,15 +48,18 @@ export class AppComponent {
             if(result == 'login'){
                 this.isLoggingIn = true;
 
-                //TODO: hash password
+                let utils: Utils = new Utils();
+                let passHash = utils.StringToHexSha256(this.password);
+
                 let req: LoginRequest = {
                     email: this.email,
-                    passHash: this.password
+                    passHash: passHash
                 };
 
                 this.apiService.login(req)
                     .subscribe(res => {
                         let loginResponse: LoginResponse = res as LoginResponse;
+                        alert(loginResponse.success);
                         this.isLoggingIn = false;
                     });
             }
@@ -70,14 +74,18 @@ export class AppComponent {
             if(result == 'signup'){
                 this.isSigningUp = true;
 
+                let utils: Utils = new Utils();
+                let passHash = utils.StringToHexSha256(this.password);
+
                 let req: SignupRequest = {
                     email: this.email,
-                    passHash: this.password
+                    passHash: passHash
                 };
 
                 this.apiService.signup(req)
                     .subscribe(res => {
                         let signupResponse: SignupResponse = res as SignupResponse;
+                        alert(signupResponse.success);
                         this.isSigningUp = false;
                     });
             }
