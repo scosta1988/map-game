@@ -59,7 +59,12 @@ export class AppComponent {
                 this.apiService.login(req)
                     .subscribe(res => {
                         let loginResponse: LoginResponse = res as LoginResponse;
-                        alert(loginResponse.success);
+                        if(loginResponse.success){
+                            //Navigate to main game page.
+                        }
+                        else{
+                            alert("Login failed. Check your email and password and try again.");
+                        }
                         this.isLoggingIn = false;
                     });
             }
@@ -85,7 +90,12 @@ export class AppComponent {
                 this.apiService.signup(req)
                     .subscribe(res => {
                         let signupResponse: SignupResponse = res as SignupResponse;
-                        alert(signupResponse.success);
+                        if(signupResponse.success){
+                            alert("Signup successful! Check your email and verify your account!");
+                        }
+                        else{
+                            alert("There was a problem when signing up. Please try again later.");
+                        }
                         this.isSigningUp = false;
                     });
             }

@@ -12,7 +12,7 @@ export class ApiService {
     }
 
     signup(req: SignupRequest): Observable<SignupResponse>{
-        return this.http.post('http://localhost:4300/login', req)
+        return this.http.post('http://localhost:4300/signup', req)
                 .map(this.handleSignupResponse);
     }
 
