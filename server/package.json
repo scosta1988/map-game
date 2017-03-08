@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "express": "^4.15.2",
+    "body-parser": "^1.17.1",
+    "nodemailer": "^3.1.4",
+    "crypto-js": "^3.1.9-1",
+    "mongo": "^0.1.0"
+  }
+}

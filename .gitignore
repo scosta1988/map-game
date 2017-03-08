@@ -47,3 +47,6 @@ map-trial/dist
 
 #VSCode settings
 .vscode
+
+#Local DB
+db
