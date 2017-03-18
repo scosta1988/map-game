@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation, Input } from '@angular/core';
 import { MouseEvent } from 'angular2-google-maps/core';
-import { NgbCarouselConfig, NgbModal, NgbProgressbarConfig } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbProgressbarConfig } from '@ng-bootstrap/ng-bootstrap';
 
 import 'rxjs/add/operator/map';
 
@@ -11,7 +11,7 @@ import { ApiService, LoginRequest, LoginResponse,
 @Component({
   selector: 'app-root',
   encapsulation: ViewEncapsulation.None,
-  providers: [NgbCarouselConfig, ApiService],
+  providers: [ApiService],
   templateUrl: './app.component.html',
   styleUrls: [
       './app.component.css',
@@ -26,13 +26,10 @@ export class AppComponent {
     isLoggingIn: boolean = false;
     isSigningUp: boolean = false;
 
-    constructor(private config: NgbCarouselConfig,
-                private loginModalService: NgbModal,
+    constructor(private loginModalService: NgbModal,
                 private signupModalService: NgbModal,
                 private progressBarsConfig: NgbProgressbarConfig,
                 private apiService: ApiService){
-
-        config.interval = 7000;
 
         progressBarsConfig.max = 1;
         progressBarsConfig.striped = true;

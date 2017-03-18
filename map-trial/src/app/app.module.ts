@@ -3,16 +3,19 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { GameComponent } from './game/game.component';
+import { WelcomeComponent } from './welcome/welcome.component';
 
 import { AgmCoreModule } from 'angular2-google-maps/core';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GameComponent
+    GameComponent,
+    WelcomeComponent
   ],
   imports: [
     BrowserModule,
@@ -21,7 +24,18 @@ import { AgmCoreModule } from 'angular2-google-maps/core';
       apiKey: 'AIzaSyAB4t1h0T-CUFkQ9Irg6b59ML-1JtkU2zs'
     }),
     NgbModule.forRoot(),
-    HttpModule
+    HttpModule,
+    RouterModule.forRoot([
+      {
+        path: 'welcome',
+        component: WelcomeComponent
+      },
+      {
+        path: '',
+        redirectTo: '/welcome',
+        pathMatch: 'full'
+      }
+    ])
   ],
   providers: [],
   bootstrap: [

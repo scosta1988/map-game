@@ -40,6 +40,8 @@
     </div>
 </header>
 
+<router-outlet></router-outlet>
+
 <template #loginModal let-close="close">
     <div class="modal-header container-fluid">
         <div class="row">
@@ -95,26 +97,3 @@
 </template>
 
 <template ngbModalContainer></template>
-
-<div class="container">
-    <div class="row row-content">
-        <div class="col-8">
-            <ngb-carousel>
-                <template ngbSlide>
-                    <img src="http://localhost:4300/image/1.png" width="100%" height="100%"/>
-                </template>
-                <template ngbSlide>
-                    <img src="http://localhost:4300/image/1.png" width="80%" height="80%"/>
-                </template>
-                <template ngbSlide>
-                    <img src="http://localhost:4300/image/1.png" width="50%" height="50%"/>
-                </template>
-            </ngb-carousel>
-        </div>
-        <div class="col-4">
-            <h2>Test your map skills</h2>
-            <h2>Challenge your friends</h2>
-            <h2>Create your own challenge</h2>
-        </div>
-    </div>
-</div>
