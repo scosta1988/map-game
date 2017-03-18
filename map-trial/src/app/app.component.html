@@ -5,7 +5,7 @@
                 <h1>{{ title }}</h1>
             </div>
 
-            <div class="col-2">
+            <div class="col-2" *ngIf="isLoggedIn == false">
                 <div *ngIf="isLoggingIn == false">
                     <button class="btn btn-success" style="width: 100%"
                         (click)="isSigningUp == false && openLoginModal(loginModal)"
@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            <div class="col-2">
+            <div class="col-2" *ngIf="isLoggedIn == false">
                 <div *ngIf="isSigningUp == false">
                     <button class="btn  btn-primary" style="width: 100%"
                             (click)="isLoggingIn == false && openSignupModal(signupModal)"

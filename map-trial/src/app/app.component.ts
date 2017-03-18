@@ -20,11 +20,13 @@ import { ApiService, LoginRequest, LoginResponse,
 })
 export class AppComponent {
     title: string = 'Map Challenge';
+
     email: string = '';
     password: string = '';
 
     isLoggingIn: boolean = false;
     isSigningUp: boolean = false;
+    isLoggedIn: boolean = false;
 
     constructor(private loginModalService: NgbModal,
                 private signupModalService: NgbModal,
@@ -38,9 +40,6 @@ export class AppComponent {
     }
 
     openLoginModal(content){
-        this.email = '';
-        this.password = '';
-
         this.loginModalService.open(content).result.then((result) => {
             if(result == 'login'){
                 this.isLoggingIn = true;
@@ -55,8 +54,12 @@ export class AppComponent {
 
                 this.apiService.login(req)
                     .subscribe(res => {
+                        this.email = '';
+                        this.password = '';
+
                         let loginResponse: LoginResponse = res as LoginResponse;
                         if(loginResponse.success){
+                            this.isLoggedIn = true;
                             //Navigate to main game page.
                         }
                         else{
@@ -69,9 +72,6 @@ export class AppComponent {
     }
 
     openSignupModal(content){
-        this.email = '';
-        this.password = '';
-
         this.signupModalService.open(content).result.then((result) => {
             if(result == 'signup'){
                 this.isSigningUp = true;
@@ -86,6 +86,9 @@ export class AppComponent {
 
                 this.apiService.signup(req)
                     .subscribe(res => {
+                        this.email = '';
+                        this.password = '';
+                        
                         let signupResponse: SignupResponse = res as SignupResponse;
                         if(signupResponse.success){
                             alert("Signup successful! Check your email and verify your account!");
