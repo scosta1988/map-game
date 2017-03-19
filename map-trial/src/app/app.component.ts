@@ -7,6 +7,7 @@ import 'rxjs/add/operator/map';
 import { Utils } from './utils/utils';
 import { ApiService, LoginRequest, LoginResponse,
          SignupRequest, SignupResponse } from './api/api.service';
+import { AccountInfoService } from './accInfo/accountInfo.service';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +32,8 @@ export class AppComponent {
     constructor(private loginModalService: NgbModal,
                 private signupModalService: NgbModal,
                 private progressBarsConfig: NgbProgressbarConfig,
-                private apiService: ApiService){
+                private apiService: ApiService,
+                private accountInfoService: AccountInfoService){
 
         progressBarsConfig.max = 1;
         progressBarsConfig.striped = true;
@@ -47,22 +49,17 @@ export class AppComponent {
                 let utils: Utils = new Utils();
                 let passHash = utils.StringToHexSha256(this.password);
 
-                let req: LoginRequest = {
-                    email: this.email,
-                    passHash: passHash
-                };
-
-                this.apiService.login(req)
+                this.accountInfoService.Login(this.email, passHash)
                     .subscribe(res => {
                         this.email = '';
                         this.password = '';
 
-                        let loginResponse: LoginResponse = res as LoginResponse;
-                        if(loginResponse.success){
+                        if(res){
                             this.isLoggedIn = true;
                             //Navigate to main game page.
                         }
                         else{
+                            this.isLoggedIn = false;
                             alert("Login failed. Check your email and password and try again.");
                         }
                         this.isLoggingIn = false;
