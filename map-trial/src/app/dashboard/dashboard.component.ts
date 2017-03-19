@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 import { ApiService } from '../api/api.service';
+import { AccountInfoService } from '../accInfo/accountInfo.service';
 
 @Component({
     selector: 'dashboard-root',
@@ -10,7 +11,9 @@ import { ApiService } from '../api/api.service';
 })
 export class DashboardComponent{
      
-     constructor(private apiService: ApiService){
+    private accountInfoService: AccountInfoService;
 
+     constructor(private apiService: ApiService){
+         this.accountInfoService = new AccountInfoService("", apiService);
      }
 }

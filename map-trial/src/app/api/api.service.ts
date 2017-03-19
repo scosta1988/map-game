@@ -2,6 +2,10 @@ import { Injectable } from "@angular/core";
 import { Http, Response } from "@angular/http";
 import { Observable } from "rxjs/Observable";
 
+import { City } from "../models/city.model";
+import { MapCentering } from "../models/mapCentering.model";
+import { Rank } from "../models/rank.model";
+
 @Injectable()
 export class ApiService {
     constructor(private http: Http) { }
@@ -56,6 +60,11 @@ export class ApiService {
                 .map(this.handleGetFinalScoreResponse);
     }
 
+    accountInformation(req: AccountInformationRequest): Observable<AccountInformationResponse>{
+        return this.http.post('http://localhost:4200/accountInformation', req)
+                .map(this.handleAccountInformationResponse);
+    }
+
     private handleLoginResponse(res: Response): LoginResponse {
         let body = res.json();
         return body as LoginResponse;
@@ -104,6 +113,11 @@ export class ApiService {
     private handleGetFinalScoreResponse(res: Response): GetFinalScoreResponse{
         let body = res.json();
         return body as GetFinalScoreResponse;
+    }
+
+    private handleAccountInformationResponse(res: Response): AccountInformationResponse{
+        let body = res.json();
+        return body as AccountInformationResponse;
     }
 }
 
@@ -206,10 +220,13 @@ export class GetFinalScoreResponse{
     Ranks: Rank[];
 }
 
-export class MapCentering{
-    lat: number;
-    lng: number;
-    zoom: number;
+export class AccountInformationRequest{
+    token: string;
 }
-export class City{}
-export class Rank{}
+export class AccountInformationResponse{
+    ErrCode: number;
+    UserId: string;
+    Name: string;
+    Ranks: Rank[];
+    AvatarUrl: string;
+}

@@ -17,6 +17,8 @@ server.use(function(req, res, next) {
 
 var tokenTimeout = 10 * 60; //10 minutes
 var ServerErrorCodes = {
+    OK: 200,
+    NotFound: 404,
     NotLoggedIn: 501
 };
 
@@ -190,6 +192,28 @@ server.get('/image/:path', function (req, res) {
             res.status(500).send(err);
         }
         res.status(200).send(data);
+    });
+});
+
+server.post('/accountInformation', function(req, res){
+    var body = req.body;
+    var token = body.token;
+
+    accountController.FetchAccount(token, function(success, account){
+        if(success){
+            res.json({
+                ErrCode: ServerErrorCodes.OK,
+                UserId: account.userId,
+                Name: account.name,
+                Ranks: account.history,
+                AvatarURL: account.picture
+            });
+        }
+        else{
+            res.json({
+                ErrCode: ServerErrorCodes.NotFound 
+            });
+        }
     });
 });
 
