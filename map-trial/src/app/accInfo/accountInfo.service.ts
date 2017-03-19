@@ -50,19 +50,19 @@ export class AccountInfoService{
                 });
     }
 
-    GetUserId(): String{
+    GetUserId(): string{
         return this.UserId;
     }
-    GetName(): String{
+    GetName(): string{
         return this.Name;
     }
-    GetToken(): String{
+    GetToken(): string{
         return this.Token;
     }
     GetRanks(): Rank[]{
         return this.Ranks;
     }
-    GetAvatarUrl(): String{
+    GetAvatarUrl(): string{
         return this.AvatarURL;
     }
 

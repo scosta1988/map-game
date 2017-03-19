@@ -36,6 +36,10 @@
                     </ngb-progressbar>
                 </div>
             </div>
+
+            <div class="col-4" *ngIf="isLoggedIn == true">
+                {{name}}
+            </div>
         </div>
     </div>
 </header>

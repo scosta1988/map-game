@@ -1,6 +1,7 @@
 import { Component, ViewEncapsulation, Input } from '@angular/core';
 import { MouseEvent } from 'angular2-google-maps/core';
 import { NgbModal, NgbProgressbarConfig } from '@ng-bootstrap/ng-bootstrap';
+import { CookieService } from 'angular2-cookie/services/cookies.service';
 
 import 'rxjs/add/operator/map';
 
@@ -12,7 +13,7 @@ import { AccountInfoService } from './accInfo/accountInfo.service';
 @Component({
   selector: 'app-root',
   encapsulation: ViewEncapsulation.None,
-  providers: [ApiService],
+  providers: [ApiService, AccountInfoService, CookieService],
   templateUrl: './app.component.html',
   styleUrls: [
       './app.component.css',
@@ -24,6 +25,8 @@ export class AppComponent {
 
     email: string = '';
     password: string = '';
+
+    name: string = '';
 
     isLoggingIn: boolean = false;
     isSigningUp: boolean = false;
@@ -56,6 +59,7 @@ export class AppComponent {
 
                         if(res){
                             this.isLoggedIn = true;
+                            this.name = this.accountInfoService.GetName();
                             //Navigate to main game page.
                         }
                         else{

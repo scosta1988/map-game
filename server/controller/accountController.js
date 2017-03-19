@@ -112,7 +112,7 @@ AccountController.prototype.Verify = function(hash, cb){
     this.loginController.Verify(hash, function(message){
         if(message.success){
             var loginInformation = message.loginInformation;
-            AccountDAO.Create(loginInformation.email, loginInformation.name, loginInformation.token,
+            AccountDAO.Create(loginInformation.email, loginInformation.email, loginInformation.token,
                               loginInformation.email, function(success, insertedId){
                                   if(success){
                                       cb(true);
