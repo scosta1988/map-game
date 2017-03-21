@@ -10,10 +10,9 @@ import { AccountInfoService } from '../accInfo/accountInfo.service';
     providers: [ApiService]
 })
 export class DashboardComponent{
-     
-    private accountInfoService: AccountInfoService;
 
-     constructor(private apiService: ApiService){
-         this.accountInfoService = new AccountInfoService("", apiService);
-     }
+     constructor(private apiService: ApiService,
+                 private accountInfoService: AccountInfoService){}
+
+     
 }

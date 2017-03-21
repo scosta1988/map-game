@@ -1,4 +1,5 @@
-import { Component, ViewEncapsulation, Input } from '@angular/core';
+import { Component, ViewEncapsulation, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { MouseEvent } from 'angular2-google-maps/core';
 import { NgbModal, NgbProgressbarConfig } from '@ng-bootstrap/ng-bootstrap';
 import { CookieService } from 'angular2-cookie/services/cookies.service';
@@ -20,7 +21,7 @@ import { AccountInfoService } from './accInfo/accountInfo.service';
       '../../node_modules/bootstrap/dist/css/bootstrap.css'
     ]
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
     title: string = 'Map Challenge';
 
     email: string = '';
@@ -36,12 +37,25 @@ export class AppComponent {
                 private signupModalService: NgbModal,
                 private progressBarsConfig: NgbProgressbarConfig,
                 private apiService: ApiService,
-                private accountInfoService: AccountInfoService){
+                private accountInfoService: AccountInfoService,
+                private router: Router){
 
         progressBarsConfig.max = 1;
         progressBarsConfig.striped = true;
         progressBarsConfig.animated = true;
         progressBarsConfig.type = 'success';
+    }
+
+    ngOnInit(){
+        this.accountInfoService.FetchAccountUsingToken()
+            .subscribe(success => {
+                if(success){
+                    this.isLoggedIn = true;
+                    this.name = this.accountInfoService.GetName();
+                    
+                    this.router.navigateByUrl("/dashboard");
+                }
+            });
     }
 
     openLoginModal(content){
@@ -59,7 +73,7 @@ export class AppComponent {
 
                         if(res){
                             //TODO: do this inside AccountInfoService.Login
-                            this.accountInfoService.FetchAccountUsingToken(this.accountInfoService.GetToken())
+                            this.accountInfoService.FetchAccountUsingToken()
                                 .subscribe(res => {
                                     this.isLoggedIn = true;
                                     this.name = this.accountInfoService.GetName();

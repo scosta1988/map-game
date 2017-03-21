@@ -1,5 +1,5 @@
 cd server
-mongod -dbpath ./db > mongodb.log &
+mongod -dbpath ~/Projects/map-game/db > mongodb.log &
 node mapGameServer.js > server.log &
 cd ../map-trial
 npm start > frontServer.log &

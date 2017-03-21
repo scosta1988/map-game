@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { GameComponent } from './game/game.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { AgmCoreModule } from 'angular2-google-maps/core';
 
@@ -15,7 +16,8 @@ import { AgmCoreModule } from 'angular2-google-maps/core';
   declarations: [
     AppComponent,
     GameComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -34,6 +36,10 @@ import { AgmCoreModule } from 'angular2-google-maps/core';
         path: '',
         redirectTo: '/welcome',
         pathMatch: 'full'
+      },
+      {
+        path: "dashboard",
+        component: DashboardComponent
       }
     ])
   ],

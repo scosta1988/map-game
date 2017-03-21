@@ -25,9 +25,9 @@ export class AccountInfoService{
         this.Token = cookieService.get(TokenKey);
     }
 
-    FetchAccountUsingToken(token: string): Observable<void>{
+    FetchAccountUsingToken(): Observable<boolean>{
         if(this.Token == null){
-            return new Observable<void>();
+            return new Observable<boolean>();
         }
 
         let req: AccountInformationRequest = {
@@ -43,9 +43,11 @@ export class AccountInfoService{
                         this.Name = accountInfoResponse.Name;
                         this.Ranks = accountInfoResponse.Ranks;
                         this.AvatarURL = accountInfoResponse.AvatarUrl;
+                        return true;
                     }
                     else{ //NotFound or token expired
                         this.cookieService.put(TokenKey, null);
+                        return false;
                     }
                 });
     }
