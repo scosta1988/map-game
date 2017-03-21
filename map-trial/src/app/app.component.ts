@@ -58,9 +58,14 @@ export class AppComponent {
                         this.password = '';
 
                         if(res){
-                            this.isLoggedIn = true;
-                            this.name = this.accountInfoService.GetName();
-                            //Navigate to main game page.
+                            //TODO: do this inside AccountInfoService.Login
+                            this.accountInfoService.FetchAccountUsingToken(this.accountInfoService.GetToken())
+                                .subscribe(res => {
+                                    this.isLoggedIn = true;
+                                    this.name = this.accountInfoService.GetName();
+                                    //Navigate to main game page.
+                                });
+                            
                         }
                         else{
                             this.isLoggedIn = false;

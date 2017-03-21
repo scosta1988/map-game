@@ -61,7 +61,7 @@ export class ApiService {
     }
 
     accountInformation(req: AccountInformationRequest): Observable<AccountInformationResponse>{
-        return this.http.post('http://localhost:4200/accountInformation', req)
+        return this.http.post('http://localhost:4300/accountInformation', req)
                 .map(this.handleAccountInformationResponse);
     }
 

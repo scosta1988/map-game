@@ -206,7 +206,7 @@ server.post('/accountInformation', function(req, res){
                 UserId: account.userId,
                 Name: account.name,
                 Ranks: account.history,
-                AvatarURL: account.picture
+                AvatarUrl: account.picture
             });
         }
         else{

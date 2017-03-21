@@ -84,8 +84,6 @@ export class AccountInfoService{
                     this.Token = loginResponse.token;
                     this.cookieService.put(TokenKey, this.Token);
 
-                    this.FetchAccountUsingToken(this.Token).subscribe();
-
                     return true;
                 }
                 else{
