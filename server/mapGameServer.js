@@ -201,6 +201,7 @@ server.post('/accountInformation', function(req, res){
 
     accountController.FetchAccount(token, function(success, account){
         if(success){
+            console.log(account);
             res.json({
                 ErrCode: ServerErrorCodes.OK,
                 UserId: account.userId,

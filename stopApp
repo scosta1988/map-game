@@ -2,4 +2,4 @@ pkill --signal SIGINT angular-cli
 pkill --signal SIGINT mapGameServer
 
 cd server
-mongod -dbpath ./db --shutdown
+mongod -dbpath ~/Projects/map-game/db --shutdown

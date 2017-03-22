@@ -28,6 +28,7 @@ export class AppComponent implements OnInit{
     password: string = '';
 
     name: string = '';
+    avatarUrl: string = '';
 
     isLoggingIn: boolean = false;
     isSigningUp: boolean = false;
@@ -52,8 +53,16 @@ export class AppComponent implements OnInit{
                 if(success){
                     this.isLoggedIn = true;
                     this.name = this.accountInfoService.GetName();
-                    
+                    this.avatarUrl = this.accountInfoService.GetAvatarUrl();
+
                     this.router.navigateByUrl("/dashboard");
+                }
+                else{
+                    this.isLoggedIn = false;
+                    this.name = "";
+                    this.avatarUrl = "";
+
+                    this.router.navigateByUrl("/welcome");
                 }
             });
     }
@@ -77,6 +86,7 @@ export class AppComponent implements OnInit{
                                 .subscribe(res => {
                                     this.isLoggedIn = true;
                                     this.name = this.accountInfoService.GetName();
+                                    this.avatarUrl = this.accountInfoService.GetAvatarUrl();
                                     //Navigate to main game page.
                                 });
                             
